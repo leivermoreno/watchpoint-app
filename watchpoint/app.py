@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 
 
 def create_app():
@@ -10,6 +10,6 @@ def create_app():
 
     @app.get("/hello")
     def hello():
-        return "Hello, world!"
+        return render_template("base.html")
 
     return app
