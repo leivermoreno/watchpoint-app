@@ -8,8 +8,9 @@ def create_app():
     # create instance folder
     os.makedirs(app.instance_path, exist_ok=True)
 
-    @app.get("/hello")
-    def hello():
-        return render_template("base.html")
+    import title.blueprint
+
+    app.register_blueprint(title.blueprint.bp)
+    app.add_url_rule("/", "index")
 
     return app

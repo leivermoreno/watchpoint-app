@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block content %}
+
+<style>
+  .container {
+    transform: translateY(-10%);
+  }
+
+  .form-floating {
+    width: 40%;
+  }
+</style>
+
+<div
+  class="container h-100 d-flex flex-column justify-content-center align-items-center"
+>
+  <h1 class="mb-3">{% block title %}Title Search{% endblock %}</h1>
+
+  <form class="w-100">
+    <div class="form-floating mb-3 mx-auto">
+      <input
+        type="text"
+        class="form-control"
+        name="titleNameInput"
+        id="titleNameInput"
+        placeholder="Title name"
+      />
+      <label for="titleNameInput">Title name</label>
+    </div>
+  </form>
+</div>
+{% endblock %}
