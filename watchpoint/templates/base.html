@@ -16,6 +16,18 @@
   </head>
 
   <body class="h-100">
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+      {{ messages[0] }}
+    </div>
+    {% endif %} {% endwith %}
+
     <main class="h-100">{% block content %}{% endblock %}</main>
     <!-- Bootstrap JavaScript Libraries -->
     <script
