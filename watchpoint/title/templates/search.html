@@ -5,8 +5,21 @@
     transform: translateY(-10%);
   }
 
-  .form-floating {
-    width: 40%;
+  @media (min-width: 992px) {
+    .form-floating,
+    .results {
+      width: 40%;
+    }
+
+    .results {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  .results {
+    max-height: 300px;
   }
 </style>
 
@@ -15,17 +28,36 @@
 >
   <h1 class="mb-3">{% block title %}Title Search{% endblock %}</h1>
 
-  <form class="w-100">
-    <div class="form-floating mb-3 mx-auto">
+  <form class="w-100 position-relative">
+    <div class="form-floating mx-auto">
       <input
         type="text"
-        class="form-control"
+        class="form-control rounded-bottom-0"
         name="title"
         id="titleNameInput"
         placeholder="Title name"
+        value="{{ title }}"
       />
       <label for="titleNameInput">Title name</label>
     </div>
+    {% if title %}
+    <div
+      class="results mx-auto overflow-y-scroll p-3 border border-top-0 rounded-bottom-1"
+    >
+      {% if titles %}
+      <div class="list-group">
+        {% for t in titles %}
+        <a
+          href="#"
+          class="list-group-item list-group-item-action p-0 mb-1 border-0"
+          >{{ t.name }}</a
+        >
+        {% endfor %}
+      </div>
+
+      {% else %}No titles{% endif %}
+    </div>
+    {% endif %}
   </form>
 </div>
 {% endblock %}
