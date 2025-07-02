@@ -10,9 +10,8 @@ def get_autocomplete_titles(s):
         params={"apiKey": api_key(), "search_value": s},
     )
 
-    if not r.status_code == requests.codes.ok:
-        results = []
-    else:
+    results = None
+    if r.status_code == requests.codes.ok:
         results = r.json()["results"]
 
     return results
