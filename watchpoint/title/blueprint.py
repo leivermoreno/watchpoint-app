@@ -1,6 +1,6 @@
-from flask import Blueprint, flash, render_template, request
+from flask import Blueprint, abort, flash, render_template, request
 
-from title.utils import get_autocomplete_titles
+from title.utils import get_autocomplete_titles, get_title_info
 
 
 bp = Blueprint("title", __name__, template_folder="templates")
@@ -18,3 +18,12 @@ def index():
             flash("Write at least 3 characters")
 
     return render_template("search.html", title=title, titles=titles)
+
+
+@bp.route("/<int:title_id>")
+def title_info(title_id):
+    title_info = get_title_info(title_id)
+    if not title_info:
+        abort(404, "Title not found.")
+
+    return render_template("title_info.html", info=title_info)

@@ -1,0 +1,29 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container pt-5">
+  <img
+    src="{{ info.posterLarge}}"
+    class="img-thumbnail float-start w-25 me-5"
+  />
+
+  <h1>{{ info.title }}</h1>
+  <p>{{ info.plot_overview }}</p>
+  <p><span class="fw-bold">Release year:</span> {{ info.year }}</p>
+  {% if info.end_year %}
+  <p><span class="fw-bold">End year:</span> {{ info.end_year }}</p>
+  {% endif %}
+  <p><span class="fw-bold">Genres:</span> {{ ', '.join(info.genre_names) }}</p>
+  <p><span class="fw-bold">User rating: </span>{{ info.user_rating }}</p>
+  <p><span class="fw-bold">Critic score: </span>{{ info.critic_score }}</p>
+  {% if info.trailer %}
+  <p><a href="{{ info.trailer }}">Watch trailer</a></p>
+  {% endif %}
+  <p>
+    <span class="fw-bold">Available on:</span>
+    {% for src in info.sources %}
+    <a href="{{ src.web_url }}">{{ src.name }}</a>{% if not loop.last %} - {%
+    endif %} {% endfor %}
+  </p>
+
+  <div class="clearfix"></div>
+</div>
+{% endblock %}

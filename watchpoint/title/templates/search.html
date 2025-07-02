@@ -5,15 +5,15 @@
     transform: translateY(-10%);
   }
 
-    .form-floating,
-    .results {
-      width: 40%;
-    }
+  .form-floating,
+  .results {
+    width: 40%;
+  }
 
-    .results {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+  .results {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     max-height: 300px;
   }
 </style>
@@ -43,7 +43,7 @@
       <div class="list-group">
         {% for t in titles %}
         <a
-          href="#"
+          href="{{ url_for('title.title_info', title_id=t.id) }}"
           class="list-group-item list-group-item-action p-0 mb-1 border-0"
           >{{ t.name }}</a
         >

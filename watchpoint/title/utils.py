@@ -15,3 +15,36 @@ def get_autocomplete_titles(s):
         results = r.json()["results"]
 
     return results
+
+
+def get_title_info(title_id):
+    r = requests.get(
+        f"https://api.watchmode.com/v1/title/{title_id}/details/",
+        params={"apiKey": api_key()},
+    )
+
+    result = None
+    if r.status_code == requests.codes.ok:
+        result = r.json()
+        result["sources"] = get_sources(title_id)
+
+    return result
+
+
+def get_sources(title_id):
+    r = requests.get(
+        f"https://api.watchmode.com/v1/title/{title_id}/sources/",
+        params={"apiKey": api_key()},
+    )
+
+    result = None
+    if r.status_code == requests.codes.ok:
+        result = r.json()
+        result_filtered = []
+        providers = set()
+        for src in result:
+            if src["region"] == "US" and src["name"] not in providers:
+                result_filtered.append(src)
+            providers.add(src["name"])
+
+    return result_filtered
