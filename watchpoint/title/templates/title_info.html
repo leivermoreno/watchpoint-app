@@ -5,7 +5,7 @@
     class="img-thumbnail float-start w-25 me-5"
   />
 
-  <h1>{{ info.title }}</h1>
+  <h1>{% block title %}{{ info.title }}{% endblock %}</h1>
   <p>{{ info.plot_overview }}</p>
   <p><span class="fw-bold">Release year:</span> {{ info.year }}</p>
   {% if info.end_year %}
