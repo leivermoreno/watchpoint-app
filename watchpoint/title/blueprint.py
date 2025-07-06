@@ -1,6 +1,6 @@
 from flask import Blueprint, flash, render_template, request
 
-from title.utils import get_autocomplete_titles, get_title_info
+from title.services import get_autocomplete_titles, get_title_info
 
 
 bp = Blueprint("title", __name__, template_folder="templates")
