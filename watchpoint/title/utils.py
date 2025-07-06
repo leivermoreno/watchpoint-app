@@ -1,5 +1,7 @@
 from flask import current_app
 import requests
+from db import db
+from title.models import Title
 
 api_key = lambda: current_app.config["WATCHMODE_API_KEY"]
 
@@ -18,15 +20,21 @@ def get_autocomplete_titles(s):
 
 
 def get_title_info(title_id):
-    r = requests.get(
-        f"https://api.watchmode.com/v1/title/{title_id}/details/",
-        params={"apiKey": api_key()},
-    )
+    result = db.session.get(Title, title_id)
 
-    result = None
-    if r.status_code == requests.codes.ok:
-        result = r.json()
-        result["sources"] = get_sources(title_id)
+    if result:
+        result = result.data
+    else:
+        r = requests.get(
+            f"https://api.watchmode.com/v1/title/{title_id}/details/",
+            params={"apiKey": api_key()},
+        )
+
+        if r.status_code == requests.codes.ok:
+            result = r.json()
+            result["sources"] = get_sources(title_id)
+            db.session.add(Title(id=result["id"], data=result))
+            db.session.commit()
 
     return result
 
