@@ -22,6 +22,10 @@ def create_app():
     app.register_blueprint(title.blueprint.bp)
     app.add_url_rule("/", "index")
 
+    import auth.blueprint
+
+    app.register_blueprint(auth.blueprint.bp)
+
     with app.app_context():
         db.create_all()
 
