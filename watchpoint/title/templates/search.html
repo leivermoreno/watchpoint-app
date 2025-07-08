@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 
 <style>
-  .container {
+  .wrapper {
     transform: translateY(-10%);
   }
 
@@ -18,41 +18,43 @@
   }
 </style>
 
-<div
-  class="container h-100 d-flex flex-column justify-content-center align-items-center"
->
-  <h1 class="mb-3">{% block title %}Title Search{% endblock %}</h1>
+<div class="container h-100">
+  <div
+    class="wrapper h-100 d-flex flex-column justify-content-center align-items-center"
+  >
+    <h1 class="mb-3">{% block title %}Title Search{% endblock %}</h1>
 
-  <form class="w-100 position-relative">
-    <div class="form-floating mx-auto">
-      <input
-        type="text"
-        class="form-control rounded-bottom-0"
-        name="title"
-        id="titleNameInput"
-        placeholder="Title name"
-        value="{{ title }}"
-      />
-      <label for="titleNameInput">Title name</label>
-    </div>
-    {% if title %}
-    <div
-      class="results mx-auto overflow-y-scroll p-3 border border-top-0 rounded-bottom-1"
-    >
-      {% if titles %}
-      <div class="list-group">
-        {% for t in titles %}
-        <a
-          href="{{ url_for('title.title_info', title_id=t.id) }}"
-          class="list-group-item list-group-item-action p-0 mb-1 border-0"
-          >{{ t.name }}</a
-        >
-        {% endfor %}
+    <form class="w-100 position-relative">
+      <div class="form-floating mx-auto">
+        <input
+          type="text"
+          class="form-control rounded-bottom-0"
+          name="title"
+          id="titleNameInput"
+          placeholder="Title name"
+          value="{{ title }}"
+        />
+        <label for="titleNameInput">Title name</label>
       </div>
+      {% if title %}
+      <div
+        class="results mx-auto overflow-y-scroll p-3 border border-top-0 rounded-bottom-1"
+      >
+        {% if titles %}
+        <div class="list-group">
+          {% for t in titles %}
+          <a
+            href="{{ url_for('title.title_info', title_id=t.id) }}"
+            class="list-group-item list-group-item-action p-0 mb-1 border-0"
+            >{{ t.name }}</a
+          >
+          {% endfor %}
+        </div>
 
-      {% else %}No titles{% endif %}
-    </div>
-    {% endif %}
-  </form>
+        {% else %}No titles{% endif %}
+      </div>
+      {% endif %}
+    </form>
+  </div>
 </div>
 {% endblock %}
