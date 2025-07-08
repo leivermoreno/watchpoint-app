@@ -15,7 +15,7 @@
     />
   </head>
 
-  <body class="h-100">
+  <body class="h-100 d-flex flex-column">
     <nav class="navbar navbar-expand navbar-light bg-light">
       <div class="container">
         <div class="nav navbar-nav align-items-center">
@@ -41,7 +41,7 @@
     </div>
     {% endif %} {% endwith %}
 
-    <main class="h-100">{% block content %}{% endblock %}</main>
+    <main class="flex-grow-1">{% block content %}{% endblock %}</main>
     <!-- Bootstrap JavaScript Libraries -->
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
