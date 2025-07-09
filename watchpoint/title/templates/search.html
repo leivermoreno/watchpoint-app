@@ -1,15 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 
 <style>
-  .wrapper {
-    transform: translateY(-10%);
-  }
-
-  .form-floating,
-  .results {
-    width: 40%;
-  }
-
   .results {
     position: absolute;
     left: 50%;
@@ -20,7 +11,7 @@
 
 <div class="container h-100">
   <div
-    class="wrapper h-100 d-flex flex-column justify-content-center align-items-center"
+    class="wrapper wrapper-40 h-100 d-flex flex-column justify-content-center align-items-center"
   >
     <h1 class="mb-3">{% block title %}Title Search{% endblock %}</h1>
 
