@@ -68,14 +68,13 @@ def load_user():
     user_id = session.get("user_id")
     if user_id is None:
         g.user = None
-        request.endpoint
     else:
         g.user = db.session.get_one(User, user_id)
 
 
 @bp.before_request
 def redirect_active_session():
-    if request.endpoint != "/auth.logout" and g.user:
+    if request.endpoint != "auth.logout" and g.user:
         return redirect(url_for("index"))
 
 
