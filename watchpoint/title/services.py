@@ -28,14 +28,15 @@ def get_title_info(title_id):
             params={"apiKey": api_key()},
         )
 
-        if not r.status_code == requests.codes.ok:
-            abort(404, "Title not found")
-
-        result = r.json()
-        result["sources"] = get_sources(title_id)
-        title = Title(id=result["id"], data=result)
-        db.session.add(title)
-        db.session.commit()
+        if r.status_code == requests.codes.ok:
+            result = r.json()
+            sources = get_sources(title_id)
+            if not sources:
+                return
+            result["sources"] = sources
+            title = Title(id=result["id"], data=result)
+            db.session.add(title)
+            db.session.commit()
 
     return title
 
@@ -46,16 +47,14 @@ def get_sources(title_id):
         params={"apiKey": api_key()},
     )
 
-    result = None
-    if not r.status_code == requests.codes.ok:
-        abort(404, "Sources not found")
-
-    result = r.json()
-    result_filtered = []
-    providers = set()
-    for src in result:
-        if src["region"] == "US" and src["name"] not in providers:
-            result_filtered.append(src)
-        providers.add(src["name"])
+    result_filtered = None
+    if r.status_code == requests.codes.ok:
+        result = r.json()
+        result_filtered = []
+        providers = set()
+        for src in result:
+            if src["region"] == "US" and src["name"] not in providers:
+                result_filtered.append(src)
+            providers.add(src["name"])
 
     return result_filtered

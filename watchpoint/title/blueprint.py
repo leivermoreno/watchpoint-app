@@ -1,4 +1,13 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for, g
+from flask import (
+    Blueprint,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+    g,
+)
 
 from title.services import get_autocomplete_titles, get_title_info
 from title.models import Watchlist
@@ -24,6 +33,8 @@ def index():
 @bp.route("/<int:title_id>")
 def title_info(title_id):
     title = get_title_info(title_id)
+    if not title:
+        abort(404)
 
     return render_template(
         "title_info.html",
@@ -35,7 +46,9 @@ def title_info(title_id):
 @bp.route("/<int:title_id>/watchlist", methods=("POST",))
 @login_required
 def modify_watchlist(title_id):
-    get_title_info(title_id)
+    title = get_title_info(title_id)
+    if not title:
+        abort(404)
 
     watchlist = request.form["watchlist"]
     if watchlist in ["pending", "completed", "favorites"]:
