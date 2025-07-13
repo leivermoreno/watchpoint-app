@@ -26,6 +26,10 @@ def create_app():
 
     app.register_blueprint(auth.blueprint.bp)
 
+    import watchlist.blueprint
+
+    app.register_blueprint(watchlist.blueprint.bp)
+
     with app.app_context():
         db.create_all()
 
