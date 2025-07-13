@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import List
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
 
@@ -7,6 +8,7 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     nickname: Mapped[str] = mapped_column(unique=True)
     _password: Mapped[str] = mapped_column("password")
+    watchlist: Mapped[List["Watchlist"]] = relationship(cascade="all, delete-orphan")
 
     @property
     def password(self):

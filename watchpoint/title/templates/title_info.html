@@ -25,5 +25,30 @@
   </p>
 
   <div class="clearfix"></div>
+
+  {% if g.user %}
+  <form
+    action="{{ url_for('title.modify_watchlist', title_id=info.id) }}"
+    method="post"
+    class="mt-3 w-25"
+  >
+    <div class="mb-3">
+      <label for="watchlist" class="form-label">Current watchlist</label>
+      <select
+        class="form-select form-select-lg"
+        name="watchlist"
+        id="watchlist"
+        onchange="this.form.submit()"
+      >
+        <option selected disabled>No current watchlist</option>
+        {% for item in ['pending', 'completed', 'favorites'] %}
+        <option {% if item == watchlist %}selected{% endif %} value="{{ item }}">
+          {{ item.capitalize() }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+  {% endif %}
 </div>
 {% endblock %}

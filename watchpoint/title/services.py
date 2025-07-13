@@ -20,11 +20,9 @@ def get_autocomplete_titles(s):
 
 
 def get_title_info(title_id):
-    result = db.session.get(Title, title_id)
+    title = db.session.get(Title, title_id)
 
-    if result:
-        result = result.data
-    else:
+    if not title:
         r = requests.get(
             f"https://api.watchmode.com/v1/title/{title_id}/details/",
             params={"apiKey": api_key()},
@@ -35,10 +33,11 @@ def get_title_info(title_id):
 
         result = r.json()
         result["sources"] = get_sources(title_id)
-        db.session.add(Title(id=result["id"], data=result))
+        title = Title(id=result["id"], data=result)
+        db.session.add(title)
         db.session.commit()
 
-    return result
+    return title
 
 
 def get_sources(title_id):
