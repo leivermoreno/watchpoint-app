@@ -7,6 +7,7 @@ from flask import (
 )
 
 from title.services import get_autocomplete_titles, get_title_info
+from watchlist.models import WATCHLIST_CHOICES
 
 bp = Blueprint("title", __name__, template_folder="templates")
 
@@ -35,4 +36,5 @@ def title_info(title_id):
         "title_info.html",
         info=title.data,
         watchlist=title.watchlist and title.watchlist.list,
+        watchlist_choices=WATCHLIST_CHOICES,
     )

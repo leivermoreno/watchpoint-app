@@ -3,7 +3,7 @@ from flask import Blueprint, abort, request, redirect, url_for, g
 
 from auth.utils import login_required
 from title.services import get_title_info
-from watchlist.models import Watchlist
+from watchlist.models import Watchlist, WATCHLIST_CHOICES
 
 
 bp = Blueprint(
@@ -19,7 +19,7 @@ def modify_watchlist(title_id):
         abort(404)
 
     watchlist = request.form["watchlist"]
-    if watchlist in ["pending", "completed", "favorites"]:
+    if watchlist in WATCHLIST_CHOICES:
         Watchlist.upsert_watchlist(g.user.id, title_id, watchlist)
 
     return redirect(url_for("title.title_info", title_id=title_id))

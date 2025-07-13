@@ -41,7 +41,7 @@
         onchange="this.form.submit()"
       >
         <option selected disabled>No current watchlist</option>
-        {% for item in ['pending', 'completed', 'favorites'] %}
+        {% for item in watchlist_choices %}
         <option {% if item == watchlist %}selected{% endif %} value="{{ item }}">
           {{ item.capitalize() }}
         </option>
