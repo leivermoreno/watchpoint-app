@@ -30,6 +30,11 @@
           >
           <a class="nav-item nav-link" href="{{ url_for('index') }}">Home</a>
           {% if g.user %}
+          <a
+            class="nav-item nav-link"
+            href="{{ url_for('watchlist.get_watchlist') }}"
+            >Watchlist</a
+          >
           <a class="nav-item nav-link" href="{{ url_for('auth.logout') }}"
             >Logout</a
           >

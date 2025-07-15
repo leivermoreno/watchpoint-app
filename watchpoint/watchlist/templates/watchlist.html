@@ -1,0 +1,26 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-5 d-flex flex-column align-items-center">
+  <h1>{% block title %}Watchlist{% endblock %}</h1>
+
+  <form class="mb-3">
+    <div>
+      <select class="form-select" name="list" id="list" onchange="this.form.submit()">
+        <option selected disabled>Filter by:</option>
+        <option value="all" {% if request.args.list == 'all' %}selected{% endif %}>All</option>
+        {% for l in list_choices %}
+        <option value="{{ l }}" {% if l == request.args.list %}selected{% endif %}>{{ l.capitalize() }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+  <div class="list-group w-50 text-center">
+    {% for w in watchlist %}
+    <a
+      href="{{ url_for('title.title_info', title_id=w.title_id) }}"
+      class="list-group-item list-group-item-action"
+      >{{ w.title.data.title}}</a
+    >
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

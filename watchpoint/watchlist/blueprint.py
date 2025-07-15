@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, request, redirect, url_for, g
+from flask import Blueprint, abort, render_template, request, redirect, url_for, g
 
 
 from auth.utils import login_required
@@ -9,6 +9,17 @@ from watchlist.models import Watchlist, WATCHLIST_CHOICES
 bp = Blueprint(
     "watchlist", __name__, url_prefix="/watchlist", template_folder="templates"
 )
+
+
+@bp.route("/")
+@login_required
+def get_watchlist():
+    list = request.args.get("list")
+    watchlist = Watchlist.get_by_user(g.user.id, list)
+
+    return render_template(
+        "watchlist.html", watchlist=watchlist, list_choices=WATCHLIST_CHOICES
+    )
 
 
 @bp.route("/<int:title_id>", methods=("POST",))
