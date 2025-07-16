@@ -6,7 +6,7 @@
     <div>
       <select class="form-select" name="list" id="list" onchange="this.form.submit()">
         <option selected disabled>Filter by:</option>
-        <option value="all" {% if request.args.list == 'all' %}selected{% endif %}>All</option>
+        <option value="all" {% if request.args.list == 'all' %}selected{% endif %} {% if not request.args.list %}disabled{% endif %}>All</option>
         {% for l in list_choices %}
         <option value="{{ l }}" {% if l == request.args.list %}selected{% endif %}>{{ l.capitalize() }}</option>
         {% endfor %}
