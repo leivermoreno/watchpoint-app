@@ -1,12 +1,7 @@
-from flask import (
-    Blueprint,
-    abort,
-    flash,
-    render_template,
-    request,
-)
+from flask import Blueprint, abort, flash, render_template, request, g
 
 from title.services import get_autocomplete_titles, get_title_info
+from watchlist.services import get_title_list_by_user
 from watchlist.models import WATCHLIST_CHOICES
 
 bp = Blueprint("title", __name__, template_folder="templates")
@@ -32,9 +27,13 @@ def title_info(title_id):
     if not title:
         abort(404)
 
+    watchlist = None
+    if g.user:
+        watchlist = get_title_list_by_user(title_id)
+
     return render_template(
         "title_info.html",
         info=title.data,
-        watchlist=title.watchlist and title.watchlist.list,
+        watchlist=watchlist and watchlist.list,
         watchlist_choices=WATCHLIST_CHOICES,
     )

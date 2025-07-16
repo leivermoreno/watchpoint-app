@@ -1,9 +1,10 @@
-from flask import Blueprint, abort, render_template, request, redirect, url_for, g
+from flask import Blueprint, abort, render_template, request, redirect, url_for
 
 
 from auth.utils import login_required
 from title.services import get_title_info
-from watchlist.models import Watchlist, WATCHLIST_CHOICES
+from watchlist.models import WATCHLIST_CHOICES
+from watchlist.services import get_watchlist_by_user, upsert_watchlist
 
 
 bp = Blueprint(
@@ -15,7 +16,7 @@ bp = Blueprint(
 @login_required
 def get_watchlist():
     list = request.args.get("list")
-    watchlist = Watchlist.get_by_user(g.user.id, list)
+    watchlist = get_watchlist_by_user(list)
 
     return render_template(
         "watchlist.html", watchlist=watchlist, list_choices=WATCHLIST_CHOICES
@@ -31,6 +32,6 @@ def modify_watchlist(title_id):
 
     watchlist = request.form["watchlist"]
     if watchlist in WATCHLIST_CHOICES:
-        Watchlist.upsert_watchlist(g.user.id, title_id, watchlist)
+        upsert_watchlist(title_id, watchlist)
 
     return redirect(url_for("title.title_info", title_id=title_id))
