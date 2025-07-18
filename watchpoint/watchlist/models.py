@@ -12,4 +12,6 @@ class Watchlist(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     list: Mapped[str] = mapped_column(Enum(*WATCHLIST_CHOICES, name="watchlist_enum"))
     title: Mapped["Title"] = relationship()
-    __table_args__ = (UniqueConstraint("title_id", "user_id", name="title_user_uc"),)
+    __table_args__ = (
+        UniqueConstraint("title_id", "user_id", name="title_user_watchlist_uc"),
+    )

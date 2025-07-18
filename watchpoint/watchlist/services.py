@@ -24,7 +24,9 @@ def upsert_watchlist(title_id, list):
     stmt = (
         insert(Watchlist)
         .values(title_id=title_id, user_id=g.user.id, list=list)
-        .on_conflict_do_update(constraint="title_user_uc", set_=dict(list=list))
+        .on_conflict_do_update(
+            constraint="title_user_watchlist_uc", set_=dict(list=list)
+        )
     )
     db.session.execute(stmt)
     db.session.commit()
