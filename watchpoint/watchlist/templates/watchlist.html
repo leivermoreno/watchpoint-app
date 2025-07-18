@@ -13,7 +13,8 @@
       </select>
     </div>
   </form>
-  <div class="list-group w-50 text-center">
+  {% if watchlist %}
+    <div class="list-group w-50 text-center">
     {% for w in watchlist %}
     <a
       href="{{ url_for('title.title_info', title_id=w.title_id) }}"
@@ -22,5 +23,8 @@
     >
     {% endfor %}
   </div>
+  {% else %}
+    <p>Begin by adding titles!</p>
+  {% endif %}
 </div>
 {% endblock %}

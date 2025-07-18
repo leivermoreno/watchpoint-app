@@ -16,7 +16,7 @@ bp = Blueprint(
 @login_required
 def get_watchlist():
     list = request.args.get("list")
-    watchlist = get_watchlist_by_user(list)
+    watchlist = get_watchlist_by_user(list).all()
 
     return render_template(
         "watchlist.html", watchlist=watchlist, list_choices=WATCHLIST_CHOICES
