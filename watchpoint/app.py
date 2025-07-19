@@ -30,6 +30,10 @@ def create_app():
 
     app.register_blueprint(watchlist.blueprint.bp)
 
+    import review.blueprint
+
+    app.register_blueprint(review.blueprint.bp)
+
     with app.app_context():
         db.create_all()
 

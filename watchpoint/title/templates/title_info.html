@@ -49,6 +49,41 @@
       </select>
     </div>
   </form>
+    {% if not review or request.args.get('edit_review') %}
+      <form action="{{ url_for('review.create_review', title_id=info.id) }}" method="post">
+        <div class="mb-3">
+        <label for="review" class="form-label">Write your review:</label>
+        <textarea class="form-control" name="comment" id="review" rows="3">{{ review.comment }}</textarea>
+      </div>
+      <span class="fw-bold me-3">Stars:</span>
+      {% for i in range(1, 6) %}
+        <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="stars"
+          id="stars{{ i }}"
+          value="{{ i }}"
+          {% if i == review.stars %}checked{% endif %}
+        />
+        <label class="form-check-label" for="stars{{ i }}">{{ i }}</label>
+        </div>
+      {% endfor %}
+      <br>
+      <button type="submit" class="btn btn-primary mt-3">Submit</button>
+      </form>
+    {% else %}
+      <p><span class="fw-bold">Your review:</span><br>
+        {{ review.comment }}<br>
+        Stars: {{ review.stars }}
+      </p>
+      <a
+        class="btn btn-primary"
+        href="{{url_for('title.title_info', title_id=info.id, edit_review=1)}}"
+        role="button"
+        >Edit</a
+      >
+    {% endif %}
   {% endif %}
 </div>
 {% endblock %}
