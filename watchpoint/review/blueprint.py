@@ -18,11 +18,14 @@ def create_review(title_id):
     comment = request.form["comment"]
     try:
         stars = int(request.form["stars"])
+        if stars < 1 or stars > 5:
+            abort(400)
     except ValueError:
         abort(400)
 
-    if len(comment.strip()) < 10 or stars < 1 or stars > 5:
-        abort(400)
+    if len(comment.strip()) < 10:
+        flash("Must provide a comment >10 characters.")
+        return redirect(url_for("title.title_info", title_id=title_id, edit_review=1))
 
     upsert_review(title_id, comment, stars)
 
