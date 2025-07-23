@@ -1,0 +1,37 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+  <h1 class="mt-5 text-center">{% block title %} Reviews {% endblock %}</h1>
+
+  <div class="reviews">
+    {% if not reviews %}
+    <p>No one has reviewed a title yet.</p>
+    {% else %} {% for r in reviews %}
+    <p>
+      Review by: <span class="fw-bold">{{ r.user.nickname }}</span> for
+      <a href="{{ url_for('title.title_info', title_id=r.title_id) }}"
+        >{{ r.title.data.title }}</a
+      ><br />
+      {{ r.comment }}<br />
+      Stars: {{ r.stars }}
+    </p>
+    {% endfor %} {% endif %}
+
+    <div class="d-flex justify-content-between">
+      <span><span class="fw-bold">Total pages:</span> {{ pages }}</span>
+      <span>
+        {% if page > 1 %}
+        <a href="{{ url_for('review.show_reviews', page=page-1) }}"
+          >Previous page</a
+        >
+        {% endif %}
+        <span>Current page: {{ page }}</span>
+        {% if page < pages %}
+        <a href="{{ url_for('review.show_reviews', page=page+1) }}"
+          >Next page</a
+        >
+        {% endif %}
+      </span>
+    </div>
+  </div>
+</div>
+{% endblock %}

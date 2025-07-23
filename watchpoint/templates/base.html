@@ -35,10 +35,20 @@
             href="{{ url_for('watchlist.get_watchlist') }}"
             >Watchlist</a
           >
+          <a
+            class="nav-item nav-link"
+            href="{{ url_for('review.show_reviews') }}"
+            >Reviews</a
+          >
           <a class="nav-item nav-link" href="{{ url_for('auth.logout') }}"
             >Logout</a
           >
           {% else %}
+          <a
+            class="nav-item nav-link"
+            href="{{ url_for('review.show_reviews') }}"
+            >Reviews</a
+          >
           <a class="nav-item nav-link" href="{{ url_for('auth.login') }}"
             >Login</a
           >

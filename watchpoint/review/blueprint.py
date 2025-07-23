@@ -1,11 +1,39 @@
-from flask import Blueprint, abort, redirect, request, url_for
+import math
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
 from title.services import get_title_info
-from review.services import upsert_review
+from review.services import (
+    upsert_review,
+    get_reviews,
+    get_review_count,
+    REVIEW_PAGE_LIMIT,
+)
 from auth.utils import login_required
 
 
 bp = Blueprint("review", __name__, url_prefix="/review", template_folder="templates")
+
+
+@bp.route("/")
+def show_reviews():
+    try:
+        page = int(request.args.get("page", 1))
+    except ValueError:
+        page = 1
+
+    review_count = get_review_count()
+    pages = math.ceil(review_count / REVIEW_PAGE_LIMIT)
+    if page > pages:
+        page = pages
+
+    reviews = get_reviews(page)
+
+    return render_template(
+        "show_reviews.html",
+        reviews=reviews,
+        page=page,
+        pages=pages,
+    )
 
 
 @bp.route("/<int:title_id>", methods=("POST",))

@@ -1,8 +1,29 @@
 from flask import g
-from sqlalchemy import select
+from sqlalchemy import select, desc, func
 from sqlalchemy.dialects.postgresql import insert
 from review.models import Review
 from db import db
+
+REVIEW_PAGE_LIMIT = 10
+
+
+def get_reviews(page):
+    offset = (page - 1) * REVIEW_PAGE_LIMIT
+    stmt = (
+        select(Review)
+        .order_by(desc("modified_at"))
+        .limit(REVIEW_PAGE_LIMIT)
+        .offset(offset)
+    )
+    result = db.session.scalars(stmt).all()
+
+    return result
+
+
+def get_review_count():
+    stmt = select(func.count()).select_from(Review)
+
+    return db.session.scalar(stmt)
 
 
 def get_title_review_by_user(title_id):
