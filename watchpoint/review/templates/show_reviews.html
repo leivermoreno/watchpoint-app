@@ -1,6 +1,9 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container">
-  <h1 class="mt-5 text-center">{% block title %} Reviews {% endblock %}</h1>
+  <h1 class="mt-5 text-center">
+    {% block title %}Reviews{% endblock %}{% if title %} for {{ title.data.title
+    }}{% endif %}
+  </h1>
 
   <div class="reviews">
     {% if not reviews %}

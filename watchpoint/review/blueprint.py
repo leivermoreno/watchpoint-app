@@ -21,18 +21,26 @@ def show_reviews():
     except ValueError:
         page = 1
 
-    review_count = get_review_count()
+    title_id = request.args.get("title_id", "").strip()
+    title = None
+    if title_id:
+        try:
+            title_id = int(title_id)
+            title = get_title_info(title_id)
+            if not title:
+                abort(404)
+        except ValueError:
+            abort(404)
+
+    review_count = get_review_count(title_id)
     pages = math.ceil(review_count / REVIEW_PAGE_LIMIT)
     if page > pages:
         page = pages
 
-    reviews = get_reviews(page)
+    reviews = get_reviews(page, title_id)
 
     return render_template(
-        "show_reviews.html",
-        reviews=reviews,
-        page=page,
-        pages=pages,
+        "show_reviews.html", reviews=reviews, page=page, pages=pages, title=title
     )
 
 

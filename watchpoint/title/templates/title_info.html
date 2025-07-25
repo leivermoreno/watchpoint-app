@@ -86,5 +86,13 @@
       >
     {% endif %}
   {% endif %}
+  <br>
+  <a
+    class="btn btn-primary mt-3"
+    href="{{ url_for('review.show_reviews', title_id=info.id) }}"
+    role="button"
+    >See other's people reviews for this title</a
+  >
+  
 </div>
 {% endblock %}

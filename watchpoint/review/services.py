@@ -7,7 +7,7 @@ from db import db
 REVIEW_PAGE_LIMIT = 10
 
 
-def get_reviews(page):
+def get_reviews(page, title_id):
     offset = (page - 1) * REVIEW_PAGE_LIMIT
     stmt = (
         select(Review)
@@ -15,13 +15,18 @@ def get_reviews(page):
         .limit(REVIEW_PAGE_LIMIT)
         .offset(offset)
     )
+    if title_id:
+        stmt = stmt.filter_by(title_id=title_id)
+
     result = db.session.scalars(stmt).all()
 
     return result
 
 
-def get_review_count():
+def get_review_count(title_id):
     stmt = select(func.count()).select_from(Review)
+    if title_id:
+        stmt = stmt.filter_by(title_id=title_id)
 
     return db.session.scalar(stmt)
 
