@@ -7,6 +7,7 @@ from review.services import (
     get_reviews,
     get_review_count,
     REVIEW_PAGE_LIMIT,
+    REVIEW_SORT_OPTIONS,
 )
 from auth.utils import login_required
 
@@ -37,10 +38,19 @@ def show_reviews():
     if page > pages:
         page = pages
 
-    reviews = get_reviews(page, title_id)
+    sort_by = request.args.get("sort_by")
+    if sort_by not in REVIEW_SORT_OPTIONS:
+        sort_by = "newest"
+
+    reviews = get_reviews(page, title_id, sort_by)
 
     return render_template(
-        "show_reviews.html", reviews=reviews, page=page, pages=pages, title=title
+        "show_reviews.html",
+        reviews=reviews,
+        page=page,
+        pages=pages,
+        title=title,
+        sort_options=REVIEW_SORT_OPTIONS,
     )
 
 

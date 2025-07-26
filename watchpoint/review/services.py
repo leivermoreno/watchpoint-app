@@ -1,20 +1,20 @@
 from flask import g
-from sqlalchemy import select, desc, func
+from sqlalchemy import select, desc, asc, func
 from sqlalchemy.dialects.postgresql import insert
 from review.models import Review
 from db import db
 
 REVIEW_PAGE_LIMIT = 10
+REVIEW_SORT_OPTIONS = ["newest", "oldest"]
 
 
-def get_reviews(page, title_id):
+def get_reviews(page, title_id, sort_by):
+    print(sort_by)
     offset = (page - 1) * REVIEW_PAGE_LIMIT
-    stmt = (
-        select(Review)
-        .order_by(desc("modified_at"))
-        .limit(REVIEW_PAGE_LIMIT)
-        .offset(offset)
-    )
+    stmt = select(Review).limit(REVIEW_PAGE_LIMIT).offset(offset)
+    sort_func = desc if sort_by == "newest" else asc
+    stmt = stmt.order_by(sort_func("modified_at"))
+
     if title_id:
         stmt = stmt.filter_by(title_id=title_id)
 

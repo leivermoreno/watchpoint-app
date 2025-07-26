@@ -8,7 +8,18 @@
   <div class="reviews">
     {% if not reviews %}
     <p>No one has reviewed a title yet.</p>
-    {% else %} {% for r in reviews %}
+    {% else %}
+    <form class="mb-3 d-flex justify-content-center">
+      <div>
+        <select class="form-select" name="sort_by" id="reviewFilter" onchange="this.form.submit()">
+          <option selected disabled>Filter by:</option>
+          {% for so in sort_options %}
+          <option value="{{ so }}" {% if so == request.args.sort_by %}selected{% endif %}>{{ so.capitalize() }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+    {% for r in reviews %}
     <p>
       Review by: <span class="fw-bold">{{ r.user.nickname }}</span> for
       <a href="{{ url_for('title.title_info', title_id=r.title_id) }}"
