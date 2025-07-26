@@ -11,6 +11,7 @@
     {% else %}
     <form class="mb-3 d-flex justify-content-center">
       <div>
+        <input name="title_id" value="{{ request.args.get('title_id', '') }}" hidden>
         <select class="form-select" name="sort_by" id="reviewFilter" onchange="this.form.submit()">
           <option selected disabled>Filter by:</option>
           {% for so in sort_options %}
