@@ -15,7 +15,8 @@
         >{{ r.title.data.title }}</a
       ><br />
       {{ r.comment }}<br />
-      Stars: {{ r.stars }}
+      Stars: {{ r.stars }}<br />
+      On: {{ r.modified_at.strftime('%B %d of %Y') }}
     </p>
     {% endfor %} {% endif %}
 
