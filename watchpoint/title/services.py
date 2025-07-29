@@ -19,7 +19,12 @@ def get_autocomplete_titles(s):
     return results
 
 
-def get_title_info(title_id):
+def get_title_info_or_404(title_id):
+    try:
+        title_id = int(title_id)
+    except ValueError:
+        abort(404)
+
     title = db.session.get(Title, title_id)
 
     if not title:
@@ -37,6 +42,8 @@ def get_title_info(title_id):
             title = Title(id=result["id"], data=result)
             db.session.add(title)
             db.session.commit()
+        else:
+            abort(404)
 
     return title
 

@@ -1,6 +1,6 @@
 from flask import Blueprint, abort, flash, render_template, request, g
 
-from title.services import get_autocomplete_titles, get_title_info
+from title.services import get_autocomplete_titles, get_title_info_or_404
 from watchlist.services import get_title_list_by_user
 from watchlist.models import WATCHLIST_CHOICES
 from review.services import get_title_review_by_user
@@ -24,9 +24,7 @@ def index():
 
 @bp.route("/<int:title_id>")
 def title_info(title_id):
-    title = get_title_info(title_id)
-    if not title:
-        abort(404)
+    title = get_title_info_or_404(title_id)
 
     watchlist = None
     review = None

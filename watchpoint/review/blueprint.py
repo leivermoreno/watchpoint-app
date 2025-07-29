@@ -1,7 +1,7 @@
 import math
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
-from title.services import get_title_info
+from title.services import get_title_info_or_404
 from review.services import (
     upsert_review,
     get_reviews,
@@ -26,15 +26,7 @@ def show_reviews():
         page = 1
 
     title_id = request.args.get("title_id", "").strip()
-    title = None
-    if title_id:
-        try:
-            title_id = int(title_id)
-            title = get_title_info(title_id)
-            if not title:
-                abort(404)
-        except ValueError:
-            abort(404)
+    title = get_title_info_or_404(title_id) if title_id else None
 
     review_count = get_review_count(title_id)
     pages = math.ceil(review_count / REVIEW_PAGE_LIMIT)
@@ -60,10 +52,7 @@ def show_reviews():
 @bp.route("/<int:title_id>", methods=("POST",))
 @login_required
 def create_review(title_id):
-    title = get_title_info(title_id)
-    if not title:
-        abort(404)
-
+    get_title_info_or_404(title_id)
     comment = request.form["comment"]
     try:
         stars = int(request.form["stars"])

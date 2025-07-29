@@ -2,7 +2,7 @@ from flask import Blueprint, abort, render_template, request, redirect, url_for
 
 
 from auth.utils import login_required
-from title.services import get_title_info
+from title.services import get_title_info_or_404
 from watchlist.models import WATCHLIST_CHOICES
 from watchlist.services import get_watchlist_by_user, upsert_watchlist
 
@@ -26,9 +26,7 @@ def get_watchlist():
 @bp.route("/<int:title_id>", methods=("POST",))
 @login_required
 def modify_watchlist(title_id):
-    title = get_title_info(title_id)
-    if not title:
-        abort(404)
+    get_title_info_or_404(title_id)
 
     watchlist = request.form["watchlist"]
     if watchlist in WATCHLIST_CHOICES:
