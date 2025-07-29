@@ -21,7 +21,7 @@
       </div>
     </form>
     {% for r in reviews %}
-    <p>
+    <p class="my-2">
       Review by: <span class="fw-bold">{{ r.user.nickname }}</span> for
       <a href="{{ url_for('title.title_info', title_id=r.title_id) }}"
         >{{ r.title.data.title }}</a
@@ -30,9 +30,18 @@
       Stars: {{ r.stars }}<br />
       On: {{ r.modified_at.strftime('%B %d of %Y') }}
     </p>
+    <span>
+      <a class="btn btn-primary"
+      href="{{ url_for('review.vote_review', review_id=r.id, upvote=1, **request.args ) }}"
+      role="button">Upvote</a>
+      <a class="btn btn-secondary"
+      href="{{ url_for('review.vote_review', review_id=r.id, **request.args ) }}"
+      role="button">Downvote</a>
+      
+    </span>
     {% endfor %} {% endif %}
 
-    <div class="d-flex justify-content-between">
+    <div class="mt-5 d-flex justify-content-between">
       <span><span class="fw-bold">Total pages:</span> {{ pages }}</span>
       <span>
         {% if page > 1 %}

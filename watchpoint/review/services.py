@@ -1,7 +1,7 @@
 from flask import g
 from sqlalchemy import select, desc, asc, func
 from sqlalchemy.dialects.postgresql import insert
-from review.models import Review
+from review.models import Review, Vote
 from db import db
 
 REVIEW_PAGE_LIMIT = 10
@@ -45,6 +45,16 @@ def upsert_review(title_id, comment, stars):
         .on_conflict_do_update(
             constraint="title_user_review_uc", set_=dict(comment=comment, stars=stars)
         )
+    )
+    db.session.execute(stmt)
+    db.session.commit()
+
+
+def upsert_vote(review_id, upvote):
+    stmt = (
+        insert(Vote)
+        .values(review_id=review_id, user_id=g.user.id, upvote=upvote)
+        .on_conflict_do_update(constraint="review_vote_uc", set_=dict(upvote=upvote))
     )
     db.session.execute(stmt)
     db.session.commit()
