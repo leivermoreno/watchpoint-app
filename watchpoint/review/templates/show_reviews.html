@@ -13,7 +13,7 @@
       <div>
         <input name="title_id" value="{{ request.args.get('title_id', '') }}" hidden>
         <select class="form-select" name="sort_by" id="reviewFilter" onchange="this.form.submit()">
-          <option selected disabled>Filter by:</option>
+          <option selected disabled>Sort by:</option>
           {% for so in sort_options %}
           <option value="{{ so }}" {% if so == request.args.sort_by %}selected{% endif %}>{{ so.capitalize() }}</option>
           {% endfor %}
