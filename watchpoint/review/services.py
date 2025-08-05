@@ -27,15 +27,19 @@ def get_reviews(page, title_id, sort_by):
             Vote.review_id,
             func.sum(case((Vote.upvote == True, 1), else_=0)).label("upvotes"),
             func.sum(case((Vote.upvote == False, 1), else_=0)).label("downvotes"),
-            func.max(
-                case(
-                    (Vote.user_id == g.user.id, cast(Vote.upvote, Integer)), else_=None
-                )
-            ).label("user_upvote"),
         )
         .where(Vote.review_id.in_(review_ids))
         .group_by(Vote.review_id)
     )
+
+    if g.user:
+        vote_stmt = vote_stmt.add_columns(
+            func.max(
+                case(
+                    (Vote.user_id == g.user.id, cast(Vote.upvote, Integer)), else_=None
+                )
+            ).label("user_upvote")
+        )
 
     vote_data = {row.review_id: row for row in db.session.execute(vote_stmt)}
     for r in reviews:
