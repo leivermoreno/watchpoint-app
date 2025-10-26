@@ -20,12 +20,21 @@ A simple web app to track movies and TV shows, manage your watchlist, and share 
 
 ## How to run
 
-Create a virtual environment and install dependencies:
+- Create a virtual environment and install dependencies:
 
 ```sh
 python -m venv venv
 pip install -r requirements.txt
 ```
+
+- Create postgresql role and database:
+
+  - Create watchpoint role
+
+  - Create watchpoint database owned by watchpoint role
+
+The configuration expects a local connection type with trust authentication for simplicity. Adjust your `pg_hba.conf`
+file as needed.
 
 Run the app in development server:
 
