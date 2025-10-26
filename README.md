@@ -27,7 +27,7 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-Run the app in development mode:
+Run the app in development server:
 
 ```sh
 flask --app watchpoint/app.py run
