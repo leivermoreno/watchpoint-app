@@ -20,23 +20,25 @@ A simple web app to track movies and TV shows, manage your watchlist, and share 
 
 ## How to run
 
-- Create a virtual environment and install dependencies:
+1. Create a virtual environment and install dependencies:
 
 ```sh
 python -m venv venv
 pip install -r requirements.txt
 ```
 
-- Create postgresql role and database:
+2. Create postgresql role and database:
 
-  - Create watchpoint role
+- Create watchpoint role
 
-  - Create watchpoint database owned by watchpoint role
+- Create watchpoint database owned by watchpoint role
 
 The configuration expects a local connection type with trust authentication for simplicity. Adjust your `pg_hba.conf`
 file as needed.
 
-Run the app in development server:
+3. Set environment variable FLASK_WATCHMODE_API_KEY with your Watchmode API key.
+
+4. Run the app in development server:
 
 ```sh
 flask --app watchpoint/app.py run
