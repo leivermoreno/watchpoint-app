@@ -10,6 +10,7 @@ def create_app():
         SQLALCHEMY_DATABASE_URI=os.getenv(
             "WATCHPOINT_DATABASE_URI", "postgresql://watchpoint@/watchpoint"
         ),
+        WATCHPOINT_WATCHMODE_API_KEY=os.environ["WATCHPOINT_WATCHMODE_API_KEY"],
     )
     app.config.from_pyfile("config.py", silent=True)
     app.config.from_prefixed_env()
