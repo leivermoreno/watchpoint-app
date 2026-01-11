@@ -36,7 +36,13 @@ pip install -r requirements.txt
 The configuration expects a local connection type with trust authentication for simplicity. Adjust your `pg_hba.conf`
 file as needed.
 
-3. Set environment variable FLASK_WATCHMODE_API_KEY with your Watchmode API key.
+3. Set the required environment variables:
+
+```sh
+export WATCHPOINT_SECRET_KEY=<your-secret-key>
+export WATCHPOINT_DATABASE_URI=<your-database-uri>
+export WATCHPOINT_WATCHMODE_API_KEY=<your-api-key>
+```
 
 4. Run the app in development server:
 

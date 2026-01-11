@@ -3,7 +3,7 @@ import requests
 from db import db
 from title.models import Title
 
-api_key = lambda: current_app.config["WATCHMODE_API_KEY"]
+api_key = lambda: current_app.config["WATCHPOINT_WATCHMODE_API_KEY"]
 
 
 def get_autocomplete_titles(s):
