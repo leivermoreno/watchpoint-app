@@ -43,7 +43,7 @@ def get_reviews(page, title_id, sort_by):
 
     vote_data = {row.review_id: row for row in db.session.execute(vote_stmt)}
     for r in reviews:
-        r.vote_data = vote_data[r.id]
+        r.vote_data = vote_data.get(r.id)
 
     return reviews
 
