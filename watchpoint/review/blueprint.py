@@ -32,6 +32,7 @@ def show_reviews():
     pages = math.ceil(review_count / REVIEW_PAGE_LIMIT)
     if page > pages:
         page = pages
+    page = max(page, 1)
 
     sort_by = request.args.get("sort_by")
     if sort_by not in REVIEW_SORT_OPTIONS:
