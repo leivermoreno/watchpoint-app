@@ -6,7 +6,7 @@ from db import db
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY=os.getenv("WATCHPOINT_SECRET_KEY", "insecure-secret"),
+        SECRET_KEY=os.environ["WATCHPOINT_SECRET_KEY"],
         SQLALCHEMY_DATABASE_URI=os.getenv(
             "WATCHPOINT_DATABASE_URI", "postgresql://watchpoint@/watchpoint"
         ),
