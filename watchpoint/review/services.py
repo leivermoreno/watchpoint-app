@@ -68,7 +68,8 @@ def upsert_review(title_id, comment, stars):
         insert(Review)
         .values(title_id=title_id, user_id=g.user.id, comment=comment, stars=stars)
         .on_conflict_do_update(
-            constraint="title_user_review_uc", set_=dict(comment=comment, stars=stars)
+            constraint="title_user_review_uc",
+            set_=dict(comment=comment, stars=stars, modified_at=func.now()),
         )
     )
     db.session.execute(stmt)

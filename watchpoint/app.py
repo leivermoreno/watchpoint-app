@@ -15,6 +15,8 @@ def create_app():
         SQLALCHEMY_ENGINE_OPTIONS={
             "pool_pre_ping": True,
             "pool_recycle": 1800,  # recycle conns older than 30 min; keep under the DB/proxy idle timeout
+            # return timestamptz values as UTC so the backend works only in UTC
+            "connect_args": {"options": "-c timezone=utc"},
         },
         WATCHPOINT_WATCHMODE_API_KEY=os.environ["WATCHPOINT_WATCHMODE_API_KEY"],
     )

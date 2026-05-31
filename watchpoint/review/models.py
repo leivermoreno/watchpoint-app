@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, UniqueConstraint, DateTime, Boolean
+from sqlalchemy import ForeignKey, UniqueConstraint, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from ..db import db
@@ -11,7 +11,7 @@ class Review(db.Model):
     title_id: Mapped[int] = mapped_column(ForeignKey("title.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     modified_at: Mapped[datetime] = mapped_column(
-        DateTime(True), default=datetime.now, onupdate=datetime.now
+        DateTime(True), default=func.now(), onupdate=func.now()
     )
     user: Mapped["User"] = relationship()
     title: Mapped["Title"] = relationship()
