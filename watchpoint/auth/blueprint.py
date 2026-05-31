@@ -10,9 +10,9 @@ from flask import (
 )
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from auth.models import User
-from db import db
-from auth.utils import validate_credentials
+from .models import User
+from ..db import db
+from .utils import validate_credentials
 
 bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
 

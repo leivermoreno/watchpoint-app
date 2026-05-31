@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask
-from db import db
+from .db import db
 
 load_dotenv()
 
@@ -26,22 +26,22 @@ def create_app():
 
     db.init_app(app)
 
-    import title.blueprint
+    from .title.blueprint import bp as title_bp
 
-    app.register_blueprint(title.blueprint.bp)
+    app.register_blueprint(title_bp)
     app.add_url_rule("/", "index")
 
-    import auth.blueprint
+    from .auth.blueprint import bp as auth_bp
 
-    app.register_blueprint(auth.blueprint.bp)
+    app.register_blueprint(auth_bp)
 
-    import watchlist.blueprint
+    from .watchlist.blueprint import bp as watchlist_bp
 
-    app.register_blueprint(watchlist.blueprint.bp)
+    app.register_blueprint(watchlist_bp)
 
-    import review.blueprint
+    from .review.blueprint import bp as review_bp
 
-    app.register_blueprint(review.blueprint.bp)
+    app.register_blueprint(review_bp)
 
     with app.app_context():
         db.create_all()

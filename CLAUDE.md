@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Running the app
 
 ```sh
-flask --app watchpoint/app.py run
+flask --app watchpoint run
 ```
 
 Required env vars (see README): `WATCHPOINT_SECRET_KEY`, `WATCHPOINT_DATABASE_URI`, `WATCHPOINT_WATCHMODE_API_KEY`. None have defaults — all three are read via `os.environ[...]`, so a missing one raises `KeyError` at startup. For local dev they can live in a gitignored `.env` (loaded by `load_dotenv()` via python-dotenv; see `.env.example`). `WATCHPOINT_DATABASE_URI` is a TCP DSN of the form `postgresql+psycopg2://user:pass@host:5432/watchpoint?sslmode=require`; `app.py` sets `SQLALCHEMY_ENGINE_OPTIONS` with `pool_pre_ping`/`pool_recycle` for resilience across networked (cloud/Docker) databases.
@@ -16,7 +16,7 @@ There is currently no test suite, linter, or formatter configured.
 
 Flask app organized as four blueprints under `watchpoint/`: `title`, `auth`, `watchlist`, `review`. Each blueprint folder contains `blueprint.py` (routes), `models.py` (SQLAlchemy), optional `services.py` (data access / external API), and a `templates/` folder. The top-level `watchpoint/templates/base.html` is the shared layout; per-blueprint templates extend it.
 
-**Import layout — important:** modules are imported unqualified (`from title.services import ...`, `from db import db`), not as a package. Flask is started with `--app watchpoint/app.py`, which puts `watchpoint/` on `sys.path`. Do not turn these into package-relative imports (`from .services import ...`) without also restructuring how the app is launched. There is no `__init__.py` and no top-level `watchpoint` package.
+**Import layout:** `watchpoint/` is a real package (it and each blueprint folder have an `__init__.py`). Modules use package-relative imports — `from .services import ...` for siblings in the same blueprint, `from ..db import db` / `from ..auth.utils import ...` for the shared `db` or another blueprint. `create_app()` lives in `app.py` and is re-exported from `watchpoint/__init__.py`, so the app is launched by package name (`flask --app watchpoint run`) and is importable elsewhere (`from watchpoint import create_app`) by tests, scripts, and `gunicorn 'watchpoint:create_app()'`.
 
 **Schema setup:** `create_app()` calls `db.create_all()` at startup. There is no migrations tool (no Alembic/Flask-Migrate) — schema changes to existing tables require manual DDL or dropping/recreating the database.
 

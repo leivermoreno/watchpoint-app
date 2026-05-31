@@ -55,5 +55,11 @@ For local development you can copy `.env.example` to `.env` and fill in the valu
 4. Run the app in development server:
 
 ```sh
-flask --app watchpoint/app.py run
+flask --app watchpoint run
+```
+
+For production, serve the factory with a WSGI server, e.g.:
+
+```sh
+gunicorn 'watchpoint:create_app()'
 ```

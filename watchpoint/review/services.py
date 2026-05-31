@@ -1,8 +1,8 @@
 from flask import g
 from sqlalchemy import select, desc, asc, func, case, cast, Integer
 from sqlalchemy.dialects.postgresql import insert
-from review.models import Review, Vote
-from db import db
+from .models import Review, Vote
+from ..db import db
 
 REVIEW_PAGE_LIMIT = 10
 REVIEW_SORT_OPTIONS = ["newest", "oldest"]

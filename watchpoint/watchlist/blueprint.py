@@ -1,10 +1,10 @@
 from flask import Blueprint, abort, render_template, request, redirect, url_for
 
 
-from auth.utils import login_required
-from title.services import get_title_info_or_404
-from watchlist.models import WATCHLIST_CHOICES
-from watchlist.services import get_watchlist_by_user, upsert_watchlist
+from ..auth.utils import login_required
+from ..title.services import get_title_info_or_404
+from .models import WATCHLIST_CHOICES
+from .services import get_watchlist_by_user, upsert_watchlist
 
 
 bp = Blueprint(

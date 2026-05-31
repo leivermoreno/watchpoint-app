@@ -1,7 +1,7 @@
 from flask import abort, current_app
 import requests
-from db import db
-from title.models import Title
+from ..db import db
+from .models import Title
 
 api_key = lambda: current_app.config["WATCHPOINT_WATCHMODE_API_KEY"]
 

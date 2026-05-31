@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, UniqueConstraint, DateTime, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
-from db import db
+from ..db import db
 
 
 class Review(db.Model):

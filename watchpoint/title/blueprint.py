@@ -1,9 +1,9 @@
 from flask import Blueprint, abort, flash, render_template, request, g
 
-from title.services import get_autocomplete_titles, get_title_info_or_404
-from watchlist.services import get_title_list_by_user
-from watchlist.models import WATCHLIST_CHOICES
-from review.services import get_title_review_by_user
+from .services import get_autocomplete_titles, get_title_info_or_404
+from ..watchlist.services import get_title_list_by_user
+from ..watchlist.models import WATCHLIST_CHOICES
+from ..review.services import get_title_review_by_user
 
 bp = Blueprint("title", __name__, template_folder="templates")
 

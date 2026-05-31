@@ -1,8 +1,8 @@
 import math
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
-from title.services import get_title_info_or_404
-from review.services import (
+from ..title.services import get_title_info_or_404
+from .services import (
     upsert_review,
     get_reviews,
     get_review_count,
@@ -10,9 +10,9 @@ from review.services import (
     REVIEW_SORT_OPTIONS,
     upsert_vote,
 )
-from review.models import Review
-from auth.utils import login_required
-from db import db
+from .models import Review
+from ..auth.utils import login_required
+from ..db import db
 
 
 bp = Blueprint("review", __name__, url_prefix="/review", template_folder="templates")

@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import generate_password_hash, check_password_hash
-from db import db
+from ..db import db
 
 
 class User(db.Model):
