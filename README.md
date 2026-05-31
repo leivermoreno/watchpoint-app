@@ -27,22 +27,30 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-2. Create postgresql role and database:
+2. Create the PostgreSQL role and database:
 
-- Create watchpoint role
+- Create a `watchpoint` role **with a password**.
 
-- Create watchpoint database owned by watchpoint role
+- Create a `watchpoint` database owned by that role.
 
-The configuration expects a local connection type with trust authentication for simplicity. Adjust your `pg_hba.conf`
-file as needed.
-
-3. Set the required environment variables:
+3. Set the required environment variables. **All three are required**:
 
 ```sh
 export WATCHPOINT_SECRET_KEY=<your-secret-key>
 export WATCHPOINT_DATABASE_URI=<your-database-uri>
 export WATCHPOINT_WATCHMODE_API_KEY=<your-api-key>
 ```
+
+`WATCHPOINT_DATABASE_URI` is a standard SQLAlchemy/PostgreSQL DSN over TCP:
+
+```
+postgresql+psycopg2://watchpoint:<password>@<host>:5432/watchpoint?sslmode=<mode>
+```
+
+> **Note:** Always set `sslmode` to `require` at minimum so the connection is encrypted.
+
+For local development you can copy `.env.example` to `.env` and fill in the values
+— the app loads `.env` automatically via [python-dotenv](https://pypi.org/project/python-dotenv/).
 
 4. Run the app in development server:
 

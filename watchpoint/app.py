@@ -10,9 +10,12 @@ def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY=os.environ["WATCHPOINT_SECRET_KEY"],
-        SQLALCHEMY_DATABASE_URI=os.getenv(
-            "WATCHPOINT_DATABASE_URI", "postgresql://watchpoint@/watchpoint"
-        ),
+        SQLALCHEMY_DATABASE_URI=os.environ["WATCHPOINT_DATABASE_URI"],
+        # keep pooled connections healthy across networked databases
+        SQLALCHEMY_ENGINE_OPTIONS={
+            "pool_pre_ping": True,
+            "pool_recycle": 1800,  # recycle conns older than 30 min; keep under the DB/proxy idle timeout
+        },
         WATCHPOINT_WATCHMODE_API_KEY=os.environ["WATCHPOINT_WATCHMODE_API_KEY"],
     )
     app.config.from_pyfile("config.py", silent=True)
