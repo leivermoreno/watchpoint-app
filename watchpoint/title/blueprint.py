@@ -34,7 +34,7 @@ def title_info(title_id):
 
     return render_template(
         "title_info.html",
-        info=title.data,
+        info=title,
         watchlist=watchlist and watchlist.list,
         watchlist_choices=WATCHLIST_CHOICES,
         review=review,

@@ -39,7 +39,7 @@ def get_title_info_or_404(title_id):
             if not sources:
                 return
             result["sources"] = sources
-            title = Title(id=result["id"], data=result)
+            title = Title.from_watchmode(result)
             db.session.add(title)
             db.session.commit()
         else:

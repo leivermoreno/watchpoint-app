@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container">
   <h1 class="mt-5 text-center">
-    {% block title %}Reviews{% endblock %}{% if title %} for {{ title.data.title
+    {% block title %}Reviews{% endblock %}{% if title %} for {{ title.name
     }}{% endif %}
   </h1>
 
@@ -24,7 +24,7 @@
     <div class="votes mb-5">
       <p class="mb-2">
         Review by: <span class="fw-bold">{{ r.user.nickname }}</span> for
-        <a href="{{ url_for('title.title_info', title_id=r.title_id) }}">{{ r.title.data.title }}</a>
+        <a href="{{ url_for('title.title_info', title_id=r.title_id) }}">{{ r.title.name }}</a>
         <br />
         {{ r.comment }}<br />
         Stars: {{ r.stars }}<br />
