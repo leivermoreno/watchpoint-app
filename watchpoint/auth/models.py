@@ -8,7 +8,15 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     nickname: Mapped[str] = mapped_column(unique=True)
     _password: Mapped[str] = mapped_column("password")
-    watchlist: Mapped[List["Watchlist"]] = relationship(cascade="all, delete-orphan")
+    watchlist: Mapped[List["Watchlist"]] = relationship(
+        cascade="all, delete-orphan", passive_deletes=True
+    )
+    reviews: Mapped[List["Review"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )
+    votes: Mapped[List["Vote"]] = relationship(
+        cascade="all, delete-orphan", passive_deletes=True
+    )
 
     @property
     def password(self):
