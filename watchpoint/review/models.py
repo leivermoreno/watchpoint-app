@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import ForeignKey, UniqueConstraint, DateTime, func
+from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from ..db import db
@@ -21,6 +21,7 @@ class Review(db.Model):
     )
     __table_args__ = (
         UniqueConstraint("title_id", "user_id", name="title_user_review_uc"),
+        CheckConstraint("stars BETWEEN 1 AND 5", name="review_stars_range"),
     )
 
 
