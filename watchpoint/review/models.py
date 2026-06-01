@@ -12,7 +12,7 @@ class Review(db.Model):
     title_id: Mapped[int] = mapped_column(ForeignKey("title.id", ondelete="CASCADE"))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
     modified_at: Mapped[datetime] = mapped_column(
-        DateTime(True), default=func.now(), onupdate=func.now()
+        DateTime(True), default=func.now(), onupdate=func.now(), index=True
     )
     user: Mapped["User"] = relationship(back_populates="reviews")
     title: Mapped["Title"] = relationship()
