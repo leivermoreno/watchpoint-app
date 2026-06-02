@@ -1,3 +1,5 @@
+from datetime import datetime
+from sqlalchemy import DateTime, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 from ..db import db
@@ -34,6 +36,9 @@ class Title(db.Model):
     critic_score: Mapped[float | None]
     trailer: Mapped[str | None]
     data: Mapped[dict] = mapped_column(JSONB)
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(True), default=func.now(), onupdate=func.now()
+    )
 
     @classmethod
     def from_watchmode(cls, data):
