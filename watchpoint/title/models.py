@@ -21,12 +21,7 @@ class Title(db.Model):
     }
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # Denormalized projections of the JSON blob below; all nullable since the
-    # Watchmode payload may omit any of them. name/type/year are indexed
-    # because they're the natural sort/filter keys for watchlists & reviews.
     name: Mapped[str | None] = mapped_column(index=True)
-    # Watchmode: movie | tv_series | tv_special | tv_miniseries | short_film | tv_movie.
-    # Plain String (not a PG Enum) so an unseen type never blocks an insert.
     type: Mapped[str | None] = mapped_column(index=True)
     year: Mapped[int | None] = mapped_column(index=True)
     end_year: Mapped[int | None]
