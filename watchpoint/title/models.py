@@ -20,7 +20,7 @@ class Title(db.Model):
         "trailer": "trailer",
     }
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
     name: Mapped[str | None] = mapped_column(index=True)
     type: Mapped[str | None] = mapped_column(index=True)
     year: Mapped[int | None] = mapped_column(index=True)
