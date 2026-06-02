@@ -12,7 +12,7 @@ class Watchlist(TimestampMixin, db.Model):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("user.id", ondelete="CASCADE"), index=True
     )
-    list: Mapped[str] = mapped_column(
+    status: Mapped[str] = mapped_column(
         Enum(
             *WATCHLIST_CHOICES,
             name="watchlist_enum",
