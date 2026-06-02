@@ -29,7 +29,7 @@
         {{ r.comment }}<br />
         Stars: {{ r.stars }}<br />
         On:
-        <time datetime="{{ r.modified_at.isoformat() }}" class="local-date">{{ r.modified_at.strftime('%B %d of %Y') }}</time>
+        <time datetime="{{ r.created_at.isoformat() }}" class="local-date">{{ r.created_at.strftime('%B %d of %Y') }}</time>
       </p>
       <span>
         <a class="btn {% if r.vote_data.user_upvote %}btn-primary{% else %}btn-secondary{% endif %}"

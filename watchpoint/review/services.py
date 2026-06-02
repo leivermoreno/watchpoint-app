@@ -12,7 +12,7 @@ def get_reviews(page, title_id, sort_by):
     offset = (page - 1) * REVIEW_PAGE_LIMIT
     stmt = select(Review).limit(REVIEW_PAGE_LIMIT).offset(offset)
     sort_func = desc if sort_by == "newest" else asc
-    stmt = stmt.order_by(sort_func("modified_at"))
+    stmt = stmt.order_by(sort_func("created_at"))
 
     if title_id:
         stmt = stmt.filter_by(title_id=title_id)
@@ -69,7 +69,7 @@ def upsert_review(title_id, comment, stars):
         .values(title_id=title_id, user_id=g.user.id, comment=comment, stars=stars)
         .on_conflict_do_update(
             constraint="title_user_review_uc",
-            set_=dict(comment=comment, stars=stars, modified_at=func.now()),
+            set_=dict(comment=comment, stars=stars, updated_at=func.now()),
         )
     )
     db.session.execute(stmt)

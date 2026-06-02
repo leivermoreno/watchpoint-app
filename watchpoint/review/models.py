@@ -1,19 +1,15 @@
 from typing import List
-from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint, DateTime, func
+from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import datetime
-from ..db import db
+from ..db import db, TimestampMixin
 
 
-class Review(db.Model):
+class Review(TimestampMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     comment: Mapped[str]
     stars: Mapped[int]
     title_id: Mapped[int] = mapped_column(ForeignKey("title.id", ondelete="CASCADE"))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
-    modified_at: Mapped[datetime] = mapped_column(
-        DateTime(True), default=func.now(), onupdate=func.now(), index=True
-    )
     user: Mapped["User"] = relationship(back_populates="reviews")
     title: Mapped["Title"] = relationship()
     votes: Mapped[List["Vote"]] = relationship(
@@ -22,10 +18,11 @@ class Review(db.Model):
     __table_args__ = (
         UniqueConstraint("title_id", "user_id", name="title_user_review_uc"),
         CheckConstraint("stars BETWEEN 1 AND 5", name="review_stars_range"),
+        Index("ix_review_created_at", "created_at"),  # backs the newest/oldest sort
     )
 
 
-class Vote(db.Model):
+class Vote(TimestampMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     upvote: Mapped[bool]
     review_id: Mapped[int] = mapped_column(ForeignKey("review.id", ondelete="CASCADE"))

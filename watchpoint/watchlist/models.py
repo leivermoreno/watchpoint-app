@@ -1,12 +1,12 @@
 from sqlalchemy import ForeignKey, Enum, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ..db import db
+from ..db import db, TimestampMixin
 
 WATCHLIST_CHOICES = ("pending", "completed", "favorites")
 
 
-class Watchlist(db.Model):
+class Watchlist(TimestampMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     title_id: Mapped[int] = mapped_column(ForeignKey("title.id", ondelete="CASCADE"))
     user_id: Mapped[int] = mapped_column(
