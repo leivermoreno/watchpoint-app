@@ -66,6 +66,10 @@ def create_review(title_id):
         flash("Must provide a comment >10 characters.")
         return redirect(url_for("title.title_info", title_id=title_id, edit_review=1))
 
+    if len(comment.strip()) > 2000:
+        flash("Comment must be <= 2000 characters.")
+        return redirect(url_for("title.title_info", title_id=title_id, edit_review=1))
+
     upsert_review(title_id, comment, stars)
 
     return redirect(url_for("title.title_info", title_id=title_id))

@@ -1,12 +1,12 @@
 from typing import List
-from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint, Index
+from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint, Index, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..db import db, TimestampMixin
 
 
 class Review(TimestampMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    comment: Mapped[str]
+    comment: Mapped[str] = mapped_column(String(2000))
     stars: Mapped[int]
     title_id: Mapped[int] = mapped_column(ForeignKey("title.id", ondelete="CASCADE"))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
