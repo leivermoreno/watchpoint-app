@@ -1,7 +1,8 @@
 import math
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, url_for
 
 from ..title.services import get_title_info_or_404
+from ..title.blueprint import render_title_info
 from .services import (
     upsert_review,
     get_reviews,
@@ -10,6 +11,7 @@ from .services import (
     REVIEW_SORT_OPTIONS,
     upsert_vote,
 )
+from .forms import ReviewForm
 from .models import Review
 from ..auth.utils import login_required
 from ..db import db
@@ -54,25 +56,13 @@ def show_reviews():
 @login_required
 def create_review(title_id):
     get_title_info_or_404(title_id)
-    comment = request.form["comment"]
-    try:
-        stars = int(request.form["stars"])
-        if stars < 1 or stars > 5:
-            abort(400)
-    except ValueError:
-        abort(400)
+    form = ReviewForm()
+    if form.validate_on_submit():
+        upsert_review(title_id, form.comment.data, form.stars.data)
+        return redirect(url_for("title.title_info", title_id=title_id))
 
-    if len(comment.strip()) < 10:
-        flash("Must provide a comment >10 characters.")
-        return redirect(url_for("title.title_info", title_id=title_id, edit_review=1))
-
-    if len(comment.strip()) > 2000:
-        flash("Comment must be <= 2000 characters.")
-        return redirect(url_for("title.title_info", title_id=title_id, edit_review=1))
-
-    upsert_review(title_id, comment, stars)
-
-    return redirect(url_for("title.title_info", title_id=title_id))
+    # Invalid: redisplay the title page with the form's inline errors.
+    return render_title_info(title_id, review_form=form)
 
 
 @bp.route("/vote/<int:review_id>")
