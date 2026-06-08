@@ -12,55 +12,44 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from .models import User
 from ..db import db
-from .utils import validate_credentials
+from .forms import SignupForm, LoginForm
 
 bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
 
 
 @bp.route("/signup", methods=("GET", "POST"))
 def signup():
-    if request.method == "POST":
-        nickname = request.form["nickname"]
-        password = request.form["password"]
+    form = SignupForm()
+    if form.validate_on_submit():
+        try:
+            user = User(nickname=form.nickname.data, password=form.password.data)
+            db.session.add(user)
+            db.session.commit()
+            flash("Welcome to Watchpoint. You can login now!.")
 
-        error = validate_credentials(nickname, password)
-        if not error:
-            try:
-                user = User(nickname=nickname, password=password)
-                db.session.add(user)
-                db.session.commit()
-                flash("Welcome to Watchpoint. You can login now!.")
+            return redirect(url_for("auth.login"))
 
-                return redirect(url_for("auth.login"))
+        except IntegrityError:
+            db.session.rollback()
+            form.nickname.errors.append("Nickname is already taken. Try another one!")
 
-            except IntegrityError:
-                error = "Nickname is already taken. Try another one!"
-
-        flash(error)
-
-    return render_template("signup.html")
+    return render_template("signup.html", form=form)
 
 
 @bp.route("/login", methods=("GET", "POST"))
 def login():
-    if request.method == "POST":
-        nickname = request.form["nickname"]
-        password = request.form["password"]
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = db.session.scalar(select(User).where(User.nickname == form.nickname.data))
+        if user and user.check_password(form.password.data):
+            session.clear()
+            session["user_id"] = user.id
 
-        error = validate_credentials(nickname, password)
-        if not error:
-            user = db.session.scalar(select(User).where(User.nickname == nickname))
-            if user and user.check_password(password):
-                session.clear()
-                session["user_id"] = user.id
+            return redirect(url_for("index"))
 
-                return redirect(url_for("index"))
+        form.form_errors.append("Invalid credentials.")
 
-            error = "Invalid credentials."
-
-        flash(error)
-
-    return render_template("signup.html")
+    return render_template("signup.html", form=form)
 
 
 @bp.before_app_request
