@@ -32,6 +32,7 @@
     method="post"
     class="mt-3 w-25"
   >
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <div class="mb-3">
       <label for="watchlist" class="form-label">Current watchlist</label>
       <select

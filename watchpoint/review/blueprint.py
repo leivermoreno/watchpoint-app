@@ -65,15 +65,15 @@ def create_review(title_id):
     return render_title_info(title_id, review_form=form)
 
 
-@bp.route("/vote/<int:review_id>")
+@bp.route("/vote/<int:review_id>", methods=("POST",))
 @login_required
 def vote_review(review_id):
-    upvote = bool(request.args.get("upvote", "").strip())
+    # Downvote omits the "upvote" field entirely, so an empty value means downvote.
+    upvote = bool(request.form.get("upvote", "").strip())
     db.get_or_404(Review, review_id)
 
     upsert_vote(review_id, upvote)
-    args = {**request.args}
-    if upvote:
-        del args["upvote"]
 
-    return redirect(url_for("review.show_reviews", **args))
+    # page / sort_by / title_id ride along in the action's query string so the
+    # redirect lands back on the same filtered page.
+    return redirect(url_for("review.show_reviews", **request.args))

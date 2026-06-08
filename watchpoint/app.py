@@ -1,9 +1,12 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask
+from flask_wtf.csrf import CSRFProtect
 from .db import db
 
 load_dotenv()
+
+csrf = CSRFProtect()
 
 
 def create_app():
@@ -27,6 +30,7 @@ def create_app():
     os.makedirs(app.instance_path, exist_ok=True)
 
     db.init_app(app)
+    csrf.init_app(app)
 
     from .title.blueprint import bp as title_bp
 
