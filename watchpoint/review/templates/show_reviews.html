@@ -35,11 +35,12 @@
       <span class="d-inline-flex gap-2">
         <form method="post" action="{{ url_for('review.vote_review', review_id=r.id, **request.args) }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <input type="hidden" name="upvote" value="1" />
+          <input type="hidden" name="vote" value="up" />
           <button type="submit" class="btn {% if r.vote_data.user_upvote %}btn-primary{% else %}btn-secondary{% endif %}">Upvote {{ r.vote_data.upvotes }}</button>
         </form>
         <form method="post" action="{{ url_for('review.vote_review', review_id=r.id, **request.args) }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="hidden" name="vote" value="down" />
           <button type="submit" class="btn {% if r.vote_data.user_upvote == 0 %}btn-primary{% else %}btn-secondary{% endif %}">Downvote {{ r.vote_data.downvotes }}</button>
         </form>
       </span>

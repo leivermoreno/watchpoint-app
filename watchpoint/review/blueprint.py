@@ -1,5 +1,5 @@
 import math
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, abort, redirect, render_template, request, url_for
 
 from ..title.services import get_title_info_or_404
 from ..title.blueprint import render_title_info
@@ -70,11 +70,13 @@ def create_review(title_id):
 @bp.route("/vote/<int:review_id>", methods=("POST",))
 @login_required
 def vote_review(review_id):
-    # Downvote omits the "upvote" field entirely, so an empty value means downvote.
-    upvote = bool(request.form.get("upvote", "").strip())
+    vote = request.form.get("vote")
+    if vote not in ("up", "down"):
+        abort(400)
+
     db.get_or_404(Review, review_id)
 
-    upsert_vote(review_id, upvote)
+    upsert_vote(review_id, vote == "up")
 
     # page / sort_by / title_id ride along in the action's query string so the
     # redirect lands back on the same filtered page.
