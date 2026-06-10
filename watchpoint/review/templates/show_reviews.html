@@ -11,11 +11,12 @@
     {% else %}
     <form class="mb-3 d-flex justify-content-center">
       <div>
-        <input name="title_id" value="{{ request.args.get('title_id', '') }}" hidden>
+        <input name="page" value="1" hidden>
+        <input name="title_id" value="{{ title_id }}" hidden>
         <select class="form-select" name="sort_by" id="reviewFilter" onchange="this.form.submit()">
           <option selected disabled>Sort by:</option>
           {% for so in sort_options %}
-          <option value="{{ so }}" {% if so == request.args.sort_by %}selected{% endif %}>{{ so.capitalize() }}</option>
+          <option value="{{ so }}" {% if so == sort_by %}selected{% endif %}>{{ so.capitalize() }}</option>
           {% endfor %}
         </select>
       </div>
@@ -49,13 +50,13 @@
       <span><span class="fw-bold">Total pages:</span> {{ pages }}</span>
       <span>
         {% if page > 1 %}
-        <a href="{{ url_for('review.show_reviews', page=page-1) }}"
+        <a href="{{ url_for('review.show_reviews', page=page-1, title_id=title_id, sort_by=sort_by) }}"
           >Previous page</a
         >
         {% endif %}
         <span>Current page: {{ page }}</span>
         {% if page < pages %}
-        <a href="{{ url_for('review.show_reviews', page=page+1) }}"
+        <a href="{{ url_for('review.show_reviews', page=page+1, title_id=title_id, sort_by=sort_by) }}"
           >Next page</a
         >
         {% endif %}

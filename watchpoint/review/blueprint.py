@@ -48,6 +48,8 @@ def show_reviews():
         page=page,
         pages=pages,
         title=title,
+        title_id=title_id,
+        sort_by=sort_by,
         sort_options=REVIEW_SORT_OPTIONS,
     )
 
