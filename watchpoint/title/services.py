@@ -35,10 +35,7 @@ def get_title_info_or_404(title_id):
 
         if r.status_code == requests.codes.ok:
             result = r.json()
-            sources = get_sources(title_id)
-            if not sources:
-                return
-            result["sources"] = sources
+            result["sources"] = get_sources(title_id) or []
             title = Title.from_watchmode(result)
             db.session.add(title)
             db.session.commit()

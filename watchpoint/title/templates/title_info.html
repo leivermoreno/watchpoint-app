@@ -19,9 +19,13 @@
   {% endif %}
   <p>
     <span class="fw-bold">Available on:</span>
-    {% for src in info.data.sources %}
-    <a href="{{ src.web_url }}">{{ src.name }}</a>{% if not loop.last %} - {%
-    endif %} {% endfor %}
+    {% if info.data.sources %}
+      {% for src in info.data.sources %}
+      <a href="{{ src.web_url }}">{{ src.name }}</a>{% if not loop.last %} - {%
+      endif %} {% endfor %}
+    {% else %}
+    No sources available
+    {% endif %}
   </p>
 
   <div class="clearfix"></div>
