@@ -1,5 +1,5 @@
 from flask import g
-from sqlalchemy import select, desc, asc, func, case, cast, Integer
+from sqlalchemy import select, delete, desc, asc, func, case, cast, Integer
 from sqlalchemy.dialects.postgresql import insert
 from .models import Review, Vote
 from ..db import db
@@ -76,7 +76,17 @@ def upsert_review(title_id, comment, stars):
     db.session.commit()
 
 
-def upsert_vote(review_id, upvote):
+def toggle_vote(review_id, upvote):
+    delete_stmt = delete(Vote).where(
+        Vote.review_id == review_id,
+        Vote.user_id == g.user.id,
+        Vote.upvote == upvote,
+    )
+    result = db.session.execute(delete_stmt)
+    if result.rowcount:
+        db.session.commit()
+        return
+
     stmt = (
         insert(Vote)
         .values(review_id=review_id, user_id=g.user.id, upvote=upvote)

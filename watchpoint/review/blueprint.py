@@ -9,7 +9,7 @@ from .services import (
     get_review_count,
     REVIEW_PAGE_LIMIT,
     REVIEW_SORT_OPTIONS,
-    upsert_vote,
+    toggle_vote,
 )
 from .forms import ReviewForm
 from .models import Review
@@ -76,7 +76,7 @@ def vote_review(review_id):
 
     db.get_or_404(Review, review_id)
 
-    upsert_vote(review_id, vote == "up")
+    toggle_vote(review_id, vote == "up")
 
     # page / sort_by / title_id ride along in the action's query string so the
     # redirect lands back on the same filtered page.
