@@ -8,7 +8,6 @@ def login_required(view):
         if not g.user:
             return redirect(url_for("auth.login"))
 
-        if view:
-            return view(*args, **kwargs)
+        return view(*args, **kwargs)
 
     return wrapper
