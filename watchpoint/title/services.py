@@ -3,8 +3,11 @@ import requests
 from ..db import db
 from .models import Title
 
-api_key = lambda: current_app.config["WATCHPOINT_WATCHMODE_API_KEY"]
 WATCHMODE_TIMEOUT = (3.05, 10)
+
+
+def api_key():
+    return current_app.config["WATCHPOINT_WATCHMODE_API_KEY"]
 
 
 def _get_watchmode_json(url, params):
