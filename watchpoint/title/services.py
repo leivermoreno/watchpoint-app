@@ -4,17 +4,30 @@ from ..db import db
 from .models import Title
 
 api_key = lambda: current_app.config["WATCHPOINT_WATCHMODE_API_KEY"]
+WATCHMODE_TIMEOUT = (3.05, 10)
+
+
+def _get_watchmode_json(url, params):
+    try:
+        response = requests.get(url, params=params, timeout=WATCHMODE_TIMEOUT)
+        if response.status_code == requests.codes.ok:
+            return response.json()
+    except requests.exceptions.RequestException:
+        current_app.logger.warning("Watchmode request failed")
+        abort(503, description="Watchmode is temporarily unavailable.")
+
+    return None
 
 
 def get_autocomplete_titles(s):
-    r = requests.get(
+    result = _get_watchmode_json(
         "https://api.watchmode.com/v1/autocomplete-search/",
-        params={"apiKey": api_key(), "search_value": s},
+        {"apiKey": api_key(), "search_value": s},
     )
 
     results = None
-    if r.status_code == requests.codes.ok:
-        results = r.json()["results"]
+    if result is not None:
+        results = result["results"]
 
     return results
 
@@ -28,13 +41,12 @@ def get_title_info_or_404(title_id):
     title = db.session.get(Title, title_id)
 
     if not title:
-        r = requests.get(
+        result = _get_watchmode_json(
             f"https://api.watchmode.com/v1/title/{title_id}/details/",
-            params={"apiKey": api_key()},
+            {"apiKey": api_key()},
         )
 
-        if r.status_code == requests.codes.ok:
-            result = r.json()
+        if result is not None:
             result["sources"] = get_sources(title_id) or []
             title = Title.from_watchmode(result)
             db.session.add(title)
@@ -46,14 +58,13 @@ def get_title_info_or_404(title_id):
 
 
 def get_sources(title_id):
-    r = requests.get(
+    result = _get_watchmode_json(
         f"https://api.watchmode.com/v1/title/{title_id}/sources/",
-        params={"apiKey": api_key()},
+        {"apiKey": api_key()},
     )
 
     result_filtered = None
-    if r.status_code == requests.codes.ok:
-        result = r.json()
+    if result is not None:
         result_filtered = []
         providers = set()
         for src in result:
