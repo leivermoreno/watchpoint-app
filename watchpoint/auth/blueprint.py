@@ -22,7 +22,8 @@ def signup():
     form = SignupForm()
     if form.validate_on_submit():
         try:
-            user = User(nickname=form.nickname.data, password=form.password.data)
+            user = User(nickname=form.nickname.data)
+            user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
             flash("Welcome to Watchpoint. You can login now!.")
