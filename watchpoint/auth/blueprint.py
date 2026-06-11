@@ -34,7 +34,7 @@ def signup():
             db.session.rollback()
             form.nickname.errors.append("Nickname is already taken. Try another one!")
 
-    return render_template("signup.html", form=form)
+    return render_template("auth_form.html", form=form, page_title="Signup")
 
 
 @bp.route("/login", methods=("GET", "POST"))
@@ -50,7 +50,7 @@ def login():
 
         form.form_errors.append("Invalid credentials.")
 
-    return render_template("signup.html", form=form)
+    return render_template("auth_form.html", form=form, page_title="Login")
 
 
 @bp.before_app_request
