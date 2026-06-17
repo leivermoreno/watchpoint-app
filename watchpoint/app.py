@@ -1,12 +1,14 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask
+from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from .db import db
 
 load_dotenv()
 
 csrf = CSRFProtect()
+migrate = Migrate()
 
 
 def create_app():
@@ -30,6 +32,7 @@ def create_app():
     os.makedirs(app.instance_path, exist_ok=True)
 
     db.init_app(app)
+    migrate.init_app(app, db)
     csrf.init_app(app)
 
     from .title.blueprint import bp as title_bp
@@ -48,8 +51,5 @@ def create_app():
     from .review.blueprint import bp as review_bp
 
     app.register_blueprint(review_bp)
-
-    with app.app_context():
-        db.create_all()
 
     return app

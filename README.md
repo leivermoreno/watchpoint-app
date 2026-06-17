@@ -60,7 +60,23 @@ postgresql+psycopg2://watchpoint:<password>@<host>:5432/watchpoint?sslmode=<mode
 For local development you can copy `.env.example` to `.env` and fill in the values
 — the app loads `.env` automatically via [python-dotenv](https://pypi.org/project/python-dotenv/).
 
-4. Run the app in development server:
+4. Apply database migrations:
+
+```sh
+flask --app watchpoint db upgrade
+```
+
+For an existing database that already matches the current schema, baseline it
+once instead:
+
+```sh
+flask --app watchpoint db stamp head
+```
+
+Only use `stamp head` when the existing schema matches the current migration
+head.
+
+5. Run the app in development server:
 
 ```sh
 flask --app watchpoint run
