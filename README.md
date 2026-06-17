@@ -18,6 +18,14 @@ A simple web app to track movies and TV shows, manage your watchlist, and share 
 - PostgreSQL, SQLAlchemy
 - Bootstrap 5
 
+### Database compatibility
+
+Watchpoint requires PostgreSQL. Although database access uses SQLAlchemy, the
+application is not database-portable: review, vote, and watchlist writes use
+PostgreSQL-specific `INSERT ... ON CONFLICT` upserts, and the schema uses a
+PostgreSQL enum. Supporting another database would require code and schema
+changes.
+
 ## How to run
 
 1. Create a virtual environment and install dependencies:
