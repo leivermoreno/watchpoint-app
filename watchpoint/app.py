@@ -11,6 +11,8 @@ csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
+    app.config.from_pyfile("config.py", silent=True)
+    app.config.from_prefixed_env()
     app.config.from_mapping(
         SECRET_KEY=os.environ["WATCHPOINT_SECRET_KEY"],
         SQLALCHEMY_DATABASE_URI=os.environ["WATCHPOINT_DATABASE_URI"],
@@ -23,8 +25,6 @@ def create_app():
         },
         WATCHPOINT_WATCHMODE_API_KEY=os.environ["WATCHPOINT_WATCHMODE_API_KEY"],
     )
-    app.config.from_pyfile("config.py", silent=True)
-    app.config.from_prefixed_env()
 
     # create instance folder
     os.makedirs(app.instance_path, exist_ok=True)
