@@ -36,6 +36,20 @@ class Title(db.Model):
     )
 
     @classmethod
-    def from_watchmode(cls, data):
+    def values_from_watchmode(cls, data):
         columns = {col: data.get(key) for key, col in cls._DENORM_COLUMNS.items()}
-        return cls(id=data["id"], data=data, **columns)
+        return {"id": data["id"], "data": data, **columns}
+
+    @classmethod
+    def watchmode_column_names(cls):
+        return tuple(cls._DENORM_COLUMNS.values())
+
+    @classmethod
+    def from_watchmode(cls, data):
+        return cls(**cls.values_from_watchmode(data))
+
+
+class TitleSearchCache(db.Model):
+    query: Mapped[str] = mapped_column(primary_key=True)
+    results: Mapped[list] = mapped_column(JSONB)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(True), default=func.now())

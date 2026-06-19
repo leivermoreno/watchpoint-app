@@ -1,6 +1,12 @@
-from flask import Blueprint, abort, flash, render_template, request, g
+from flask import Blueprint, flash, g, render_template, request
 
-from .services import get_autocomplete_titles, get_title_info_or_404
+from .services import (
+    SEARCH_MAX_LENGTH,
+    SEARCH_MIN_LENGTH,
+    clean_search_query,
+    get_autocomplete_titles,
+    get_title_info_or_404,
+)
 from ..watchlist.services import get_title_list_by_user
 from ..watchlist.models import WATCHLIST_CHOICES
 from ..review.services import get_title_review_by_user
@@ -14,13 +20,22 @@ def index():
     title = ""
     titles = None
     if request.args.get("title"):
-        title = request.args["title"].strip()
-        if len(title) >= 3:
-            titles = get_autocomplete_titles(title)
+        title = clean_search_query(request.args["title"])
+        if len(title) < SEARCH_MIN_LENGTH:
+            flash(f"Write at least {SEARCH_MIN_LENGTH} characters")
+        elif len(title) > SEARCH_MAX_LENGTH:
+            title = title[:SEARCH_MAX_LENGTH]
+            flash(f"Search must be {SEARCH_MAX_LENGTH} characters or fewer")
         else:
-            flash("Write at least 3 characters")
+            titles = get_autocomplete_titles(title)
 
-    return render_template("search.html", title=title, titles=titles)
+    return render_template(
+        "search.html",
+        title=title,
+        titles=titles,
+        search_min_length=SEARCH_MIN_LENGTH,
+        search_max_length=SEARCH_MAX_LENGTH,
+    )
 
 
 def render_title_info(title_id, review_form=None):
