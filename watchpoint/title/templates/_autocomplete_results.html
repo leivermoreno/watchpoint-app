@@ -1,6 +1,7 @@
+{% set overlay = results_overlay|default(true) %}
 <div
   id="titleSearchResults"
-  class="results position-absolute w-100 overflow-y-scroll p-3 border border-top-0 rounded-bottom-1 bg-white{% if not show_results %} d-none{% endif %}"
+  class="results w-100 overflow-y-scroll p-3 border bg-white{% if overlay %} position-absolute border-top-0 rounded-bottom-1{% else %} mt-3 rounded-1{% endif %}{% if not show_results %} d-none{% endif %}"
   aria-live="polite"
 >
   {% if show_results %}

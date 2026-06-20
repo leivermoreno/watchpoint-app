@@ -4,6 +4,16 @@
   .results {
     max-height: 300px;
   }
+
+  .search-submit-button {
+    width: 58px;
+    height: 58px;
+  }
+
+  .search-submit-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
 </style>
 
 <div class="container h-100">
@@ -13,25 +23,51 @@
     <h1 class="mb-3">{% block title %}Title Search{% endblock %}</h1>
 
     <div class="w-100 position-relative">
-      <div class="form-floating mx-auto">
-        <input
-          type="search"
-          class="form-control rounded-bottom-0"
-          name="q"
-          id="titleNameInput"
-          placeholder="Title name"
-          minlength="{{ search_min_length }}"
-          maxlength="{{ search_max_length }}"
-          autocomplete="off"
-          aria-controls="titleSearchResults"
-          hx-get="{{ url_for('title.autocomplete_titles') }}"
-          hx-trigger="input changed delay:250ms, search"
-          hx-target="#titleSearchResults"
-          hx-swap="outerHTML"
-          hx-sync="this:replace"
-        />
-        <label for="titleNameInput">Title name</label>
-      </div>
+      <form method="get" action="{{ url_for('title.index') }}">
+        <div class="d-flex gap-2">
+          <div class="form-floating flex-grow-1">
+            <input
+              type="search"
+              class="form-control"
+              name="q"
+              id="titleNameInput"
+              placeholder="Title name"
+              value="{{ query }}"
+              minlength="{{ search_min_length }}"
+              maxlength="{{ search_max_length }}"
+              autocomplete="off"
+              aria-controls="titleSearchResults"
+              hx-get="{{ url_for('title.index') }}"
+              hx-trigger="input changed delay:250ms, search"
+              hx-target="#titleSearchResults"
+              hx-swap="outerHTML"
+              hx-sync="this:replace"
+            />
+            <label for="titleNameInput">Title name</label>
+          </div>
+          <button
+            type="submit"
+            class="btn btn-primary search-submit-button d-inline-flex align-items-center justify-content-center flex-shrink-0"
+            aria-label="Search"
+            title="Search"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+          </button>
+        </div>
+      </form>
       {% include "_autocomplete_results.html" %}
     </div>
   </div>

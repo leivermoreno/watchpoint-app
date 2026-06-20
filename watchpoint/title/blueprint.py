@@ -1,4 +1,4 @@
-from flask import Blueprint, g, render_template, request
+from flask import Blueprint, g, make_response, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 
 from .services import (
@@ -18,24 +18,50 @@ bp = Blueprint("title", __name__, template_folder="templates")
 
 @bp.route("/")
 def index():
+    query_submitted = "q" in request.args
+    query = clean_search_query(request.args.get("q", ""))
+    htmx_request = is_htmx_request()
+    results = search_results_context(
+        query,
+        query_submitted=query_submitted,
+        htmx_request=htmx_request,
+    )
+
+    if htmx_request:
+        response = make_response(render_autocomplete_results(**results))
+        if not query:
+            response.headers["HX-Replace-Url"] = url_for("title.index")
+
+        return response
+
     return render_template(
         "search.html",
         search_min_length=SEARCH_MIN_LENGTH,
         search_max_length=SEARCH_MAX_LENGTH,
-        titles=[],
-        message=None,
-        show_results=False,
+        query=query,
+        results_overlay=False,
+        **results,
     )
 
 
-@bp.get("/titles/autocomplete")
-def autocomplete_titles():
-    query = clean_search_query(request.args.get("q", ""))
+def is_htmx_request():
+    return request.headers.get("HX-Request") == "true"
+
+
+def search_results_context(query, query_submitted=False, htmx_request=False):
     if len(query) < SEARCH_MIN_LENGTH:
-        return render_autocomplete_results()
+        if query_submitted and not htmx_request:
+            return dict(
+                titles=[],
+                message=f"Search must be at least {SEARCH_MIN_LENGTH} characters",
+                show_results=True,
+            )
+
+        return dict(titles=[], message=None, show_results=False)
 
     if len(query) > SEARCH_MAX_LENGTH:
-        return render_autocomplete_results(
+        return dict(
+            titles=[],
             message=f"Search must be {SEARCH_MAX_LENGTH} characters or fewer",
             show_results=True,
         )
@@ -44,15 +70,17 @@ def autocomplete_titles():
         titles = get_autocomplete_titles(query) or []
     except HTTPException as exc:
         if exc.code == 503:
-            return render_autocomplete_results(
+            return dict(
+                titles=[],
                 message="Search is temporarily unavailable",
                 show_results=True,
             )
 
         raise
 
-    return render_autocomplete_results(
+    return dict(
         titles=autocomplete_result_titles(titles),
+        message=None,
         show_results=True,
     )
 
@@ -74,12 +102,15 @@ def autocomplete_result_titles(titles):
     return results
 
 
-def render_autocomplete_results(titles=None, message=None, show_results=False):
+def render_autocomplete_results(
+    titles=None, message=None, show_results=False, results_overlay=True
+):
     return render_template(
         "_autocomplete_results.html",
         titles=titles or [],
         message=message,
         show_results=show_results,
+        results_overlay=results_overlay,
     )
 
 
