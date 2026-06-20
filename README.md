@@ -22,9 +22,9 @@ A simple web app to track movies and TV shows, manage your watchlist, and share 
 
 Watchpoint requires PostgreSQL. Although database access uses SQLAlchemy, the
 application is not database-portable: review, vote, and watchlist writes use
-PostgreSQL-specific `INSERT ... ON CONFLICT` upserts, and the schema uses a
-PostgreSQL enum. Supporting another database would require code and schema
-changes.
+PostgreSQL-specific `INSERT ... ON CONFLICT` upserts, and title/search cache
+storage uses PostgreSQL `JSONB`. Supporting another database would require code
+and schema changes.
 
 ## How to run
 
