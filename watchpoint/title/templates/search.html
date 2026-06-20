@@ -12,39 +12,28 @@
   >
     <h1 class="mb-3">{% block title %}Title Search{% endblock %}</h1>
 
-    <form class="w-100 position-relative">
+    <div class="w-100 position-relative">
       <div class="form-floating mx-auto">
         <input
-          type="text"
+          type="search"
           class="form-control rounded-bottom-0"
-          name="title"
+          name="q"
           id="titleNameInput"
           placeholder="Title name"
           minlength="{{ search_min_length }}"
           maxlength="{{ search_max_length }}"
-          value="{{ title }}"
+          autocomplete="off"
+          aria-controls="titleSearchResults"
+          hx-get="{{ url_for('title.autocomplete_titles') }}"
+          hx-trigger="input changed delay:250ms, search"
+          hx-target="#titleSearchResults"
+          hx-swap="outerHTML"
+          hx-sync="this:replace"
         />
         <label for="titleNameInput">Title name</label>
       </div>
-      {% if title %}
-      <div
-        class="results position-absolute w-100 overflow-y-scroll p-3 border border-top-0 rounded-bottom-1"
-      >
-        {% if titles %}
-        <div class="list-group">
-          {% for t in titles %}
-          <a
-            href="{{ url_for('title.title_info', title_id=t.id) }}"
-            class="list-group-item list-group-item-action p-0 mb-1 border-0"
-            >{{ t.name }}</a
-          >
-          {% endfor %}
-        </div>
-
-        {% else %}No titles{% endif %}
-      </div>
-      {% endif %}
-    </form>
+      {% include "_autocomplete_results.html" %}
+    </div>
   </div>
 </div>
 {% endblock %}

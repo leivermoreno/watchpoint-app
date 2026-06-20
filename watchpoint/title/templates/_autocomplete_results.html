@@ -1,0 +1,23 @@
+<div
+  id="titleSearchResults"
+  class="results position-absolute w-100 overflow-y-scroll p-3 border border-top-0 rounded-bottom-1 bg-white{% if not show_results %} d-none{% endif %}"
+  aria-live="polite"
+>
+  {% if show_results %}
+  {% if message %}
+  {{ message }}
+  {% elif titles %}
+  <div class="list-group">
+    {% for title in titles %}
+    <a
+      href="{{ url_for('title.title_info', title_id=title.id) }}"
+      class="list-group-item list-group-item-action p-0 mb-1 border-0"
+      >{{ title.name }}</a
+    >
+    {% endfor %}
+  </div>
+  {% else %}
+  No titles
+  {% endif %}
+  {% endif %}
+</div>

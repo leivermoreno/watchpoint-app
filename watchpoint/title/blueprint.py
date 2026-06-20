@@ -1,4 +1,5 @@
-from flask import Blueprint, flash, g, render_template, request
+from flask import Blueprint, g, render_template, request
+from werkzeug.exceptions import HTTPException
 
 from .services import (
     SEARCH_MAX_LENGTH,
@@ -17,24 +18,68 @@ bp = Blueprint("title", __name__, template_folder="templates")
 
 @bp.route("/")
 def index():
-    title = ""
-    titles = None
-    if request.args.get("title"):
-        title = clean_search_query(request.args["title"])
-        if len(title) < SEARCH_MIN_LENGTH:
-            flash(f"Write at least {SEARCH_MIN_LENGTH} characters")
-        elif len(title) > SEARCH_MAX_LENGTH:
-            title = title[:SEARCH_MAX_LENGTH]
-            flash(f"Search must be {SEARCH_MAX_LENGTH} characters or fewer")
-        else:
-            titles = get_autocomplete_titles(title)
-
     return render_template(
         "search.html",
-        title=title,
-        titles=titles,
         search_min_length=SEARCH_MIN_LENGTH,
         search_max_length=SEARCH_MAX_LENGTH,
+        titles=[],
+        message=None,
+        show_results=False,
+    )
+
+
+@bp.get("/titles/autocomplete")
+def autocomplete_titles():
+    query = clean_search_query(request.args.get("q", ""))
+    if len(query) < SEARCH_MIN_LENGTH:
+        return render_autocomplete_results()
+
+    if len(query) > SEARCH_MAX_LENGTH:
+        return render_autocomplete_results(
+            message=f"Search must be {SEARCH_MAX_LENGTH} characters or fewer",
+            show_results=True,
+        )
+
+    try:
+        titles = get_autocomplete_titles(query) or []
+    except HTTPException as exc:
+        if exc.code == 503:
+            return render_autocomplete_results(
+                message="Search is temporarily unavailable",
+                show_results=True,
+            )
+
+        raise
+
+    return render_autocomplete_results(
+        titles=autocomplete_result_titles(titles),
+        show_results=True,
+    )
+
+
+def autocomplete_result_titles(titles):
+    results = []
+    for title in titles:
+        try:
+            title_id = int(title["id"])
+        except (KeyError, TypeError, ValueError):
+            continue
+
+        name = title.get("name")
+        if not name:
+            continue
+
+        results.append({"id": title_id, "name": name})
+
+    return results
+
+
+def render_autocomplete_results(titles=None, message=None, show_results=False):
+    return render_template(
+        "_autocomplete_results.html",
+        titles=titles or [],
+        message=message,
+        show_results=show_results,
     )
 
 
