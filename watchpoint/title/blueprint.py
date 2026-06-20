@@ -114,6 +114,8 @@ def render_autocomplete_results(
     )
 
 
+# Shared by the title page route and review validation failures, where the
+# submitted form needs to be rendered again with inline errors.
 def render_title_info(title_id, review_form=None):
     title = get_title_info_or_404(title_id)
 
