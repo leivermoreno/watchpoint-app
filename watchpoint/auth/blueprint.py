@@ -13,6 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from .models import User
 from ..db import db
 from .forms import SignupForm, LoginForm
+from .utils import next_url_from_request
 
 bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
 
@@ -40,17 +41,20 @@ def signup():
 @bp.route("/login", methods=("GET", "POST"))
 def login():
     form = LoginForm()
+    next_url = next_url_from_request()
     if form.validate_on_submit():
         user = db.session.scalar(select(User).where(User.nickname == form.nickname.data))
         if user and user.check_password(form.password.data):
             session.clear()
             session["user_id"] = user.id
 
-            return redirect(url_for("index"))
+            return redirect(next_url or url_for("index"))
 
         form.form_errors.append("Invalid credentials.")
 
-    return render_template("auth_form.html", form=form, page_title="Login")
+    return render_template(
+        "auth_form.html", form=form, page_title="Login", next_url=next_url
+    )
 
 
 @bp.before_app_request

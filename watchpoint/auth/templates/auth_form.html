@@ -9,6 +9,9 @@
 
     <form method="post" class="d-flex flex-column">
       {{ form.csrf_token }}
+      {% if next_url %}
+      <input type="hidden" name="next" value="{{ next_url }}" />
+      {% endif %}
       {% for error in form.form_errors %}
       <div class="alert alert-danger" role="alert">{{ error }}</div>
       {% endfor %}
