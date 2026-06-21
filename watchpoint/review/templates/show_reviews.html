@@ -16,7 +16,7 @@
         <input name="page" value="1" hidden>
         <input name="title_id" value="{{ title_id }}" hidden>
         <select class="form-select" name="sort_by" id="reviewFilter" onchange="this.form.submit()">
-          <option selected disabled>Sort by:</option>
+          <option disabled>Sort by:</option>
           {% for so in sort_options %}
           <option value="{{ so }}" {% if so == sort_by %}selected{% endif %}>{{ so.capitalize() }}</option>
           {% endfor %}

@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for
 
 
 from ..auth.utils import login_required
@@ -15,11 +15,18 @@ bp = Blueprint(
 @bp.route("/")
 @login_required
 def get_watchlist():
-    status = request.args.get("status")
+    selected_status = request.args.get("status", "all")
+    if selected_status not in (*WATCHLIST_CHOICES, "all"):
+        selected_status = "all"
+
+    status = None if selected_status == "all" else selected_status
     watchlist = get_watchlist_by_user(status).all()
 
     return render_template(
-        "watchlist.html", watchlist=watchlist, list_choices=WATCHLIST_CHOICES
+        "watchlist.html",
+        watchlist=watchlist,
+        list_choices=WATCHLIST_CHOICES,
+        selected_status=selected_status,
     )
 
 

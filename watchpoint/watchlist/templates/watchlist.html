@@ -7,10 +7,10 @@
   <form class="mb-3">
     <div>
       <select class="form-select" name="status" id="status" onchange="this.form.submit()">
-        <option selected disabled>Filter by:</option>
-        <option value="all" {% if request.args.status == 'all' %}selected{% endif %} {% if not request.args.status %}disabled{% endif %}>All</option>
+        <option disabled>Filter by:</option>
+        <option value="all" {% if selected_status == 'all' %}selected{% endif %}>All</option>
         {% for l in list_choices %}
-        <option value="{{ l }}" {% if l == request.args.status %}selected{% endif %}>{{ l.capitalize() }}</option>
+        <option value="{{ l }}" {% if l == selected_status %}selected{% endif %}>{{ l.capitalize() }}</option>
         {% endfor %}
       </select>
     </div>
