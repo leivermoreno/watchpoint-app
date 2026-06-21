@@ -2,13 +2,13 @@
 {% from 'macros/forms.html' import floating_field %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
-<div class="container h-100">
-  <div
-    class="wrapper wrapper-40 h-100 d-flex flex-column justify-content-center"
-  >
-    <h1 class="mb-3 text-center">{{ page_title }}</h1>
+<div class="container auth-page d-flex align-items-center">
+  <div class="content-narrow w-100 mx-auto">
+    <div class="page-header text-center">
+      <h1 class="page-title">{{ page_title }}</h1>
+    </div>
 
-    <form method="post" class="d-flex flex-column">
+    <form method="post" class="surface auth-panel d-flex flex-column">
       {{ form.csrf_token }}
       {% if next_url %}
       <input type="hidden" name="next" value="{{ next_url }}" />
@@ -20,7 +20,7 @@
       {{ floating_field(form.nickname, placeholder="Nickname") }}
       {{ floating_field(form.password, placeholder="Password") }}
 
-      <button type="submit" class="btn btn-primary mx-auto">Submit</button>
+      <button type="submit" class="btn btn-primary w-100">Submit</button>
     </form>
   </div>
 </div>

@@ -19,43 +19,78 @@
     />
   </head>
 
-  <body class="h-100 d-flex flex-column">
-    <nav class="navbar navbar-expand navbar-light bg-light">
+  <body class="app-body h-100 d-flex flex-column">
+    {% set current_endpoint = request.endpoint or "" %}
+    <nav class="navbar navbar-expand-md app-navbar">
       <div class="container">
-        <div class="nav navbar-nav align-items-center">
-          <a
-            class="nav-item nav-link fw-bold text-black fs-5 fst-italic"
-            href="{{ url_for('index') }}"
-            >WATCHPOINT</a
-          >
-          <a class="nav-item nav-link" href="{{ url_for('index') }}">Home</a>
-          {% if g.user %}
-          <a
-            class="nav-item nav-link"
-            href="{{ url_for('watchlist.get_watchlist') }}"
-            >Watchlist</a
-          >
-          <a
-            class="nav-item nav-link"
-            href="{{ url_for('review.show_reviews') }}"
-            >Reviews</a
-          >
-          <a class="nav-item nav-link" href="{{ url_for('auth.logout') }}"
-            >Logout</a
-          >
-          {% else %}
-          <a
-            class="nav-item nav-link"
-            href="{{ url_for('review.show_reviews') }}"
-            >Reviews</a
-          >
-          <a class="nav-item nav-link" href="{{ url_for('auth.login') }}"
-            >Login</a
-          >
-          <a class="nav-item nav-link" href="{{ url_for('auth.signup') }}"
-            >Signup</a
-          >
-          {% endif %}
+        <a
+          class="navbar-brand app-brand"
+          href="{{ url_for('index') }}"
+          >WATCHPOINT</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainNav"
+          aria-controls="mainNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+          <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a
+                class="nav-link {% if current_endpoint == 'title.index' %}active{% endif %}"
+                href="{{ url_for('index') }}"
+                {% if current_endpoint == 'title.index' %}aria-current="page"{% endif %}
+                >Home</a
+              >
+            </li>
+            {% if g.user %}
+            <li class="nav-item">
+              <a
+                class="nav-link {% if current_endpoint.startswith('watchlist.') %}active{% endif %}"
+                href="{{ url_for('watchlist.get_watchlist') }}"
+                {% if current_endpoint.startswith('watchlist.') %}aria-current="page"{% endif %}
+                >Watchlist</a
+              >
+            </li>
+            {% endif %}
+            <li class="nav-item">
+              <a
+                class="nav-link {% if current_endpoint.startswith('review.') %}active{% endif %}"
+                href="{{ url_for('review.show_reviews') }}"
+                {% if current_endpoint.startswith('review.') %}aria-current="page"{% endif %}
+                >Reviews</a
+              >
+            </li>
+          </ul>
+          <ul class="navbar-nav align-items-md-center gap-md-2">
+            {% if g.user %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a
+                class="nav-link {% if current_endpoint == 'auth.login' %}active{% endif %}"
+                href="{{ url_for('auth.login') }}"
+                {% if current_endpoint == 'auth.login' %}aria-current="page"{% endif %}
+                >Login</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="btn btn-primary btn-sm app-nav-action"
+                href="{{ url_for('auth.signup') }}"
+                >Signup</a
+              >
+            </li>
+            {% endif %}
+          </ul>
         </div>
       </div>
     </nav>
@@ -69,6 +104,8 @@
       "danger": "danger",
     } %}
     {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+      <div class="container app-alerts">
       {% for category, message in messages %}
       <div
         class="alert alert-{{ alert_classes.get(category, 'primary') }} alert-dismissible fade show"
@@ -83,9 +120,11 @@
         {{ message }}
       </div>
       {% endfor %}
+      </div>
+      {% endif %}
     {% endwith %}
 
-    <main class="flex-grow-1">{% block content %}{% endblock %}</main>
+    <main class="app-main flex-grow-1">{% block content %}{% endblock %}</main>
     <!-- Bootstrap JavaScript Libraries -->
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

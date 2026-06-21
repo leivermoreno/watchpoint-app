@@ -1,14 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}Title Search{% endblock %}
 {% block content %}
+<div class="container search-page d-flex">
+  <div class="search-content content-narrow w-100 mx-auto">
+    <div class="page-header text-center">
+      <h1 class="page-title">Title Search</h1>
+    </div>
 
-<div class="container h-100">
-  <div
-    class="wrapper wrapper-40 h-100 d-flex flex-column justify-content-center align-items-center"
-  >
-    <h1 class="mb-3">Title Search</h1>
-
-    <div class="w-100 position-relative">
+    <div class="surface search-panel position-relative">
       <form method="get" action="{{ url_for('title.index') }}">
         <div class="d-flex gap-2">
           <div class="form-floating flex-grow-1">

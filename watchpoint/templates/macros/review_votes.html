@@ -3,12 +3,12 @@
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}" />
   <input type="hidden" name="vote" value="{{ vote }}" />
-  <button type="submit" class="btn {% if active %}btn-primary{% else %}btn-secondary{% endif %}">{{ label }} {{ count|default(0) }}</button>
+  <button type="submit" class="btn btn-sm {% if active %}btn-primary{% else %}btn-outline-secondary{% endif %}">{{ label }} {{ count|default(0) }}</button>
 </form>
 {% endmacro %}
 
 {% macro review_vote_controls(review) %}
-<span class="d-inline-flex gap-2">
+<span class="review-vote-controls d-inline-flex flex-wrap gap-2">
   {{ review_vote_form(review, 'up', 'Upvote', review.vote_data.upvotes, review.vote_data.user_upvote) }}
   {{ review_vote_form(review, 'down', 'Downvote', review.vote_data.downvotes, review.vote_data.user_upvote == 0) }}
 </span>

@@ -2,98 +2,162 @@
 {% from 'macros/forms.html' import textarea_field %}
 {% block title %}{{ info.name }}{% endblock %}
 {% block content %}
-<div class="container pt-5">
-  <img
-    src="{{ info.poster_large}}"
-    class="img-thumbnail float-start w-25 me-5"
-  />
-
-  <h1>{{ info.name }}</h1>
-  <p>{{ info.plot_overview }}</p>
-  <p><span class="fw-bold">Release year:</span> {{ info.year }}</p>
-  {% if info.end_year %}
-  <p><span class="fw-bold">End year:</span> {{ info.end_year }}</p>
-  {% endif %}
-  <p><span class="fw-bold">Genres:</span> {{ ', '.join(info.data.genre_names) }}</p>
-  <p><span class="fw-bold">User rating: </span>{{ info.user_rating }}</p>
-  <p><span class="fw-bold">Critic score: </span>{{ info.critic_score }}</p>
-  {% if info.trailer %}
-  <p><a href="{{ info.trailer }}">Watch trailer</a></p>
-  {% endif %}
-  <p>
-    <span class="fw-bold">Available on:</span>
-    {% if info.data.sources %}
-      {% for src in info.data.sources %}
-      <a href="{{ src.web_url }}">{{ src.name }}</a>{% if not loop.last %} - {%
-      endif %} {% endfor %}
-    {% else %}
-    No sources available
-    {% endif %}
-  </p>
-
-  <div class="clearfix"></div>
-
-  {% if g.user %}
-  <form
-    action="{{ url_for('watchlist.modify_watchlist', title_id=info.id) }}"
-    method="post"
-    class="mt-3 w-25"
-  >
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-    <div class="mb-3">
-      <label for="watchlist" class="form-label">Current watchlist</label>
-      <select
-        class="form-select form-select-lg"
-        name="watchlist"
-        id="watchlist"
-        onchange="this.form.submit()"
-      >
-        <option value="" {% if not watchlist %}selected{% endif %}>No current watchlist</option>
-        {% for item in watchlist_choices %}
-        <option {% if item == watchlist %}selected{% endif %} value="{{ item }}">
-          {{ item.capitalize() }}
-        </option>
-        {% endfor %}
-      </select>
+{% set genres = info.data.genre_names|default([], true) %}
+{% set sources = info.data.sources|default([], true) %}
+<div class="container page-shell">
+  <div class="row g-4 g-lg-5 align-items-start">
+    <div class="col-12 col-md-4 col-lg-3">
+      {% if info.poster_large %}
+      <img
+        src="{{ info.poster_large }}"
+        class="title-poster img-fluid"
+        alt="{{ info.name }} poster"
+      />
+      {% else %}
+      <div class="title-poster title-poster-placeholder d-flex align-items-center justify-content-center text-center">
+        No poster
+      </div>
+      {% endif %}
     </div>
-  </form>
-    {% if show_review_form %}
-      <form action="{{ url_for('review.create_review', title_id=info.id) }}" method="post">
-        {{ form.csrf_token }}
-        {{ textarea_field(form.comment, rows=3) }}
-      <span class="fw-bold me-3">Stars:</span>
-      {% for sub in form.stars %}
-        <div class="form-check form-check-inline">
-        {{ sub(class="form-check-input" + (" is-invalid" if form.stars.errors else "")) }}
-        {{ sub.label(class="form-check-label") }}
+
+    <div class="col-12 col-md-8 col-lg-9">
+      <div class="page-header">
+        <h1 class="page-title">{{ info.name }}</h1>
+        <div class="title-meta">
+          {% if info.year %}
+          <span>{{ info.year }}</span>
+          {% endif %}
+          {% if info.end_year %}
+          <span>Ended {{ info.end_year }}</span>
+          {% endif %}
         </div>
-      {% endfor %}
-      {% for error in form.stars.errors %}
-      <div class="text-danger small">{{ error }}</div>
-      {% endfor %}
-      <br>
-      <button type="submit" class="btn btn-primary mt-3">Submit</button>
-      </form>
-    {% else %}
-      <p><span class="fw-bold">Your review:</span><br>
-        {{ review.comment }}<br>
-        Stars: {{ review.stars }}
-      </p>
-      <a
-        class="btn btn-primary"
-        href="{{url_for('title.title_info', title_id=info.id, edit_review=1)}}"
-        role="button"
-        >Edit review</a
-      >
-    {% endif %}
-  {% endif %}
-  <br>
-  <a
-    class="btn btn-primary mt-3"
-    href="{{ url_for('review.show_reviews', title_id=info.id) }}"
-    role="button"
-    >See other's people reviews for this title</a
-  >
-  
+      </div>
+
+      {% if info.plot_overview %}
+      <p class="title-overview">{{ info.plot_overview }}</p>
+      {% endif %}
+
+      <div class="row row-cols-1 row-cols-sm-2 g-3 section-block">
+        <div class="col">
+          <div class="metric">
+            <span class="metric-label">User rating</span>
+            <span class="metric-value">{{ info.user_rating if info.user_rating is not none else "N/A" }}</span>
+          </div>
+        </div>
+        <div class="col">
+          <div class="metric">
+            <span class="metric-label">Critic score</span>
+            <span class="metric-value">{{ info.critic_score if info.critic_score is not none else "N/A" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="section-block">
+        <h2 class="section-title">Genres</h2>
+        {% if genres %}
+        <div class="chip-row">
+          {% for genre in genres %}
+          <span class="badge rounded-pill app-chip">{{ genre }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-body-secondary mb-0">No genres listed.</p>
+        {% endif %}
+      </section>
+
+      <section class="section-block">
+        <h2 class="section-title">Available on</h2>
+        {% if sources %}
+        <div class="source-list">
+          {% for src in sources %}
+          <a class="source-link" href="{{ src.web_url }}" target="_blank" rel="noopener">{{ src.name }}</a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-body-secondary mb-0">No sources available.</p>
+        {% endif %}
+      </section>
+
+      <div class="section-block d-flex flex-wrap gap-2">
+        {% if info.trailer %}
+        <a class="btn btn-outline-primary" href="{{ info.trailer }}" target="_blank" rel="noopener">Watch trailer</a>
+        {% endif %}
+        <a
+          class="btn btn-primary"
+          href="{{ url_for('review.show_reviews', title_id=info.id) }}"
+          role="button"
+          >Read reviews</a
+        >
+      </div>
+
+      {% if g.user %}
+      <section class="section-block soft-surface interaction-panel">
+        <h2 class="section-title">Watchlist</h2>
+        <form
+          action="{{ url_for('watchlist.modify_watchlist', title_id=info.id) }}"
+          method="post"
+          class="row g-2 align-items-end"
+        >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="col-12 col-sm-8 col-lg-5">
+            <label for="watchlist" class="form-label">Current watchlist</label>
+            <select
+              class="form-select"
+              name="watchlist"
+              id="watchlist"
+              onchange="this.form.submit()"
+            >
+              <option value="" {% if not watchlist %}selected{% endif %}>No current watchlist</option>
+              {% for item in watchlist_choices %}
+              <option {% if item == watchlist %}selected{% endif %} value="{{ item }}">
+                {{ item.capitalize() }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </section>
+
+        {% if show_review_form %}
+        <section class="section-block soft-surface interaction-panel">
+          <h2 class="section-title">Your review</h2>
+          <form action="{{ url_for('review.create_review', title_id=info.id) }}" method="post">
+            {{ form.csrf_token }}
+            {{ textarea_field(form.comment, rows=4) }}
+            <div class="mb-3">
+              <div class="section-title mb-2">Stars</div>
+              <div class="rating-options">
+                {% for sub in form.stars %}
+                <div class="form-check form-check-inline m-0">
+                  {{ sub(class="form-check-input" + (" is-invalid" if form.stars.errors else "")) }}
+                  {{ sub.label(class="form-check-label") }}
+                </div>
+                {% endfor %}
+              </div>
+              {% for error in form.stars.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit review</button>
+          </form>
+        </section>
+        {% else %}
+        <section class="section-block soft-surface interaction-panel">
+          <h2 class="section-title">Your review</h2>
+          <p class="user-review mb-3">{{ review.comment }}</p>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="rating-pill">{{ review.stars }} stars</span>
+            <a
+              class="btn btn-outline-primary"
+              href="{{ url_for('title.title_info', title_id=info.id, edit_review=1) }}"
+              role="button"
+              >Edit review</a
+            >
+          </div>
+        </section>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

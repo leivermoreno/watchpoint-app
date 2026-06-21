@@ -1,7 +1,7 @@
 {% set overlay = results_overlay|default(true) %}
 <div
   id="titleSearchResults"
-  class="title-search-results w-100 overflow-y-scroll p-3 border bg-white{% if overlay %} position-absolute border-top-0 rounded-bottom-1{% else %} mt-3 rounded-1{% endif %}{% if not show_results %} d-none{% endif %}"
+  class="title-search-results w-100 overflow-y-auto p-2 border bg-white{% if overlay %} title-search-results-overlay position-absolute start-0 top-100 border-top-0 rounded-bottom shadow-sm{% else %} mt-3 rounded shadow-sm{% endif %}{% if not show_results %} d-none{% endif %}"
   aria-live="polite"
 >
   {% if show_results %}
@@ -12,7 +12,7 @@
     {% for title in titles %}
     <a
       href="{{ url_for('title.title_info', title_id=title.id) }}"
-      class="list-group-item list-group-item-action p-0 mb-1 border-0"
+      class="list-group-item list-group-item-action px-3 py-2 mb-1 border-0"
       >{{ title.name }}</a
     >
     {% endfor %}

@@ -2,63 +2,87 @@
 {% from 'macros/review_votes.html' import review_vote_controls with context %}
 {% block title %}Reviews{% endblock %}
 {% block content %}
-<div class="container">
-  <h1 class="mt-5 text-center">
-    Reviews{% if title %} for {{ title.name }}{% endif %}
-  </h1>
+<div class="container page-shell">
+  <div class="content-wide mx-auto">
+    <div class="page-header d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
+      <h1 class="page-title mb-0">
+        Reviews{% if title %}<span class="d-block fs-3 text-body-secondary mt-2">for {{ title.name }}</span>{% endif %}
+      </h1>
 
-  <div class="reviews">
-    {% if not has_reviews %}
-    {% if title %}
-    <p>No one has reviewed {{ title.name }} yet.</p>
-    {% else %}
-    <p>No one has reviewed a title yet.</p>
-    {% endif %}
-    {% else %}
-    <form class="mb-3 d-flex justify-content-center">
-      <div>
-        <input name="page" value="1" hidden>
-        <input name="title_id" value="{{ title_id }}" hidden>
-        <select class="form-select" name="sort_by" id="reviewFilter" onchange="this.form.submit()">
-          <option disabled>Sort by:</option>
-          {% for so in sort_options %}
-          <option value="{{ so }}" {% if so == sort_by %}selected{% endif %}>{{ so.capitalize() }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </form>
-    {% for r in reviews %}
-    <div class="votes mb-5">
-      <p class="mb-2">
-        Review by: <span class="fw-bold">{{ r.user.nickname }}</span> for
-        <a href="{{ url_for('title.title_info', title_id=r.title_id) }}">{{ r.title.name }}</a>
-        <br />
-        {{ r.comment }}<br />
-        Stars: {{ r.stars }}<br />
-        On:
-        <time datetime="{{ r.created_at.isoformat() }}" class="local-date">{{ r.created_at.strftime('%B %d of %Y') }}</time>
-      </p>
-      {{ review_vote_controls(r) }}
+      {% if has_reviews %}
+      <form class="row row-cols-lg-auto g-2 align-items-center">
+        <input type="hidden" name="page" value="1">
+        {% if title_id %}
+        <input type="hidden" name="title_id" value="{{ title_id }}">
+        {% endif %}
+        <div class="col-12">
+          <label class="visually-hidden" for="reviewFilter">Sort by</label>
+          <select class="form-select" name="sort_by" id="reviewFilter" onchange="this.form.submit()">
+            <option disabled>Sort by:</option>
+            {% for so in sort_options %}
+            <option value="{{ so }}" {% if so == sort_by %}selected{% endif %}>{{ so.capitalize() }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </form>
+      {% endif %}
     </div>
-    {% endfor %} {% endif %}
+
+    {% if not has_reviews %}
+    <div class="soft-surface empty-state">
+    {% if title %}
+      <p class="mb-0">No one has reviewed {{ title.name }} yet.</p>
+    {% else %}
+      <p class="mb-0">No one has reviewed a title yet.</p>
+    {% endif %}
+    </div>
+    {% else %}
+    <div class="review-list">
+    {% for r in reviews %}
+    <article class="review-item soft-surface">
+      <div class="d-flex flex-column flex-sm-row justify-content-between gap-3">
+        <div>
+          <div class="review-meta">
+            Review by <span class="fw-bold">{{ r.user.nickname }}</span>
+            on
+            <time datetime="{{ r.created_at.isoformat() }}" class="local-date">{{ r.created_at.strftime('%B %d of %Y') }}</time>
+          </div>
+          <h2 class="review-title">
+            <a href="{{ url_for('title.title_info', title_id=r.title_id) }}">{{ r.title.name }}</a>
+          </h2>
+        </div>
+        <span class="rating-pill align-self-start">{{ r.stars }} stars</span>
+      </div>
+      <p class="review-comment">{{ r.comment }}</p>
+      {{ review_vote_controls(r) }}
+    </article>
+    {% endfor %}
+    </div>
+    {% endif %}
 
     {% if has_reviews %}
-    <div class="mt-5 d-flex justify-content-between">
-      <span><span class="fw-bold">Total pages:</span> {{ pages }}</span>
-      <span>
+    <nav class="mt-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3" aria-label="Review pages">
+      <span class="text-body-secondary">Page {{ page }} of {{ pages }}</span>
+      <ul class="pagination mb-0">
+        <li class="page-item{% if page <= 1 %} disabled{% endif %}">
         {% if page > 1 %}
-        <a href="{{ url_for('review.show_reviews', page=page-1, title_id=title_id, sort_by=sort_by) }}"
-          >Previous page</a
-        >
+          <a class="page-link" href="{{ url_for('review.show_reviews', page=page-1, title_id=title_id, sort_by=sort_by) }}">Previous</a>
+        {% else %}
+          <span class="page-link">Previous</span>
         {% endif %}
-        <span>Current page: {{ page }}</span>
+        </li>
+        <li class="page-item active" aria-current="page">
+          <span class="page-link">{{ page }}</span>
+        </li>
+        <li class="page-item{% if page >= pages %} disabled{% endif %}">
         {% if page < pages %}
-        <a href="{{ url_for('review.show_reviews', page=page+1, title_id=title_id, sort_by=sort_by) }}"
-          >Next page</a
-        >
+          <a class="page-link" href="{{ url_for('review.show_reviews', page=page+1, title_id=title_id, sort_by=sort_by) }}">Next</a>
+        {% else %}
+          <span class="page-link">Next</span>
         {% endif %}
-      </span>
-    </div>
+        </li>
+      </ul>
+    </nav>
     {% endif %}
   </div>
 </div>

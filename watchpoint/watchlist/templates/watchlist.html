@@ -1,32 +1,41 @@
 {% extends 'base.html' %}
 {% block title %}Watchlist{% endblock %}
 {% block content %}
-<div class="container mt-5 d-flex flex-column align-items-center">
-  <h1>Watchlist</h1>
+<div class="container page-shell">
+  <div class="content-medium mx-auto">
+    <div class="page-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-end gap-3">
+      <h1 class="page-title mb-0">Watchlist</h1>
 
-  <form class="mb-3">
-    <div>
-      <select class="form-select" name="status" id="status" onchange="this.form.submit()">
+      <form>
+        <label class="visually-hidden" for="status">Filter by</label>
+        <select class="form-select" name="status" id="status" onchange="this.form.submit()">
         <option disabled>Filter by:</option>
         <option value="all" {% if selected_status == 'all' %}selected{% endif %}>All</option>
         {% for l in list_choices %}
         <option value="{{ l }}" {% if l == selected_status %}selected{% endif %}>{{ l.capitalize() }}</option>
         {% endfor %}
-      </select>
+        </select>
+      </form>
     </div>
-  </form>
-  {% if watchlist %}
-    <div class="list-group w-50 text-center">
-    {% for w in watchlist %}
-    <a
-      href="{{ url_for('title.title_info', title_id=w.title_id) }}"
-      class="list-group-item list-group-item-action"
-      >{{ w.title.name}}</a
-    >
-    {% endfor %}
+
+    {% if watchlist %}
+    <div class="list-group list-shell">
+      {% for w in watchlist %}
+      <a
+        href="{{ url_for('title.title_info', title_id=w.title_id) }}"
+        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-3"
+        >
+        <span class="fw-semibold text-truncate">{{ w.title.name }}</span>
+        <span class="badge rounded-pill status-badge flex-shrink-0">{{ w.status.capitalize() }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="soft-surface empty-state">
+      <p class="mb-3">Start by adding titles.</p>
+      <a class="btn btn-primary" href="{{ url_for('index') }}">Find titles</a>
+    </div>
+    {% endif %}
   </div>
-  {% else %}
-    <p>Start by adding titles!</p>
-  {% endif %}
 </div>
 {% endblock %}
