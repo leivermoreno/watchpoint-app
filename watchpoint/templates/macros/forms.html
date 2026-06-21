@@ -1,0 +1,19 @@
+{% macro floating_field(field, placeholder=None, wrapper_class="form-floating mb-3", control_class="form-control") %}
+<div class="{{ wrapper_class }}">
+  {{ field(class=control_class + (" is-invalid" if field.errors else ""), placeholder=placeholder or field.label.text) }}
+  {{ field.label }}
+  {% for error in field.errors %}
+  <div class="invalid-feedback">{{ error }}</div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro textarea_field(field, rows=3, wrapper_class="mb-3", label_class="form-label", control_class="form-control") %}
+<div class="{{ wrapper_class }}">
+  {{ field.label(class=label_class) }}
+  {{ field(class=control_class + (" is-invalid" if field.errors else ""), rows=rows) }}
+  {% for error in field.errors %}
+  <div class="invalid-feedback">{{ error }}</div>
+  {% endfor %}
+</div>
+{% endmacro %}

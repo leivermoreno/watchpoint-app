@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% from 'macros/forms.html' import textarea_field %}
+{% block content %}
 <div class="container pt-5">
   <img
     src="{{ info.poster_large}}"
@@ -57,13 +59,7 @@
     {% if show_review_form %}
       <form action="{{ url_for('review.create_review', title_id=info.id) }}" method="post">
         {{ form.csrf_token }}
-        <div class="mb-3">
-        {{ form.comment.label(class="form-label") }}
-        {{ form.comment(class="form-control" + (" is-invalid" if form.comment.errors else ""), rows="3") }}
-        {% for error in form.comment.errors %}
-        <div class="invalid-feedback">{{ error }}</div>
-        {% endfor %}
-      </div>
+        {{ textarea_field(form.comment, rows=3) }}
       <span class="fw-bold me-3">Stars:</span>
       {% for sub in form.stars %}
         <div class="form-check form-check-inline">

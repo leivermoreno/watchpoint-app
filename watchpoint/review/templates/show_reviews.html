@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% from 'macros/review_votes.html' import review_vote_controls with context %}
+{% block content %}
 <div class="container">
   <h1 class="mt-5 text-center">
     {% block title %}Reviews{% endblock %}{% if title %} for {{ title.name
@@ -32,20 +34,7 @@
         On:
         <time datetime="{{ r.created_at.isoformat() }}" class="local-date">{{ r.created_at.strftime('%B %d of %Y') }}</time>
       </p>
-      <span class="d-inline-flex gap-2">
-        <form method="post" action="{{ url_for('review.vote_review', review_id=r.id, **request.args) }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}" />
-          <input type="hidden" name="vote" value="up" />
-          <button type="submit" class="btn {% if r.vote_data.user_upvote %}btn-primary{% else %}btn-secondary{% endif %}">Upvote {{ r.vote_data.upvotes|default(0) }}</button>
-        </form>
-        <form method="post" action="{{ url_for('review.vote_review', review_id=r.id, **request.args) }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}" />
-          <input type="hidden" name="vote" value="down" />
-          <button type="submit" class="btn {% if r.vote_data.user_upvote == 0 %}btn-primary{% else %}btn-secondary{% endif %}">Downvote {{ r.vote_data.downvotes|default(0) }}</button>
-        </form>
-      </span>
+      {{ review_vote_controls(r) }}
     </div>
     {% endfor %} {% endif %}
 
