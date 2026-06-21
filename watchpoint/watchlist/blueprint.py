@@ -1,10 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, flash, render_template, request, redirect, url_for
 
 
 from ..auth.utils import login_required
 from ..title.services import get_title_info_or_404
 from .models import WATCHLIST_CHOICES
-from .services import get_watchlist_by_user, upsert_watchlist
+from .services import get_watchlist_by_user, remove_watchlist, upsert_watchlist
 
 
 bp = Blueprint(
@@ -35,8 +35,14 @@ def get_watchlist():
 def modify_watchlist(title_id):
     get_title_info_or_404(title_id)
 
-    watchlist = request.form["watchlist"]
-    if watchlist in WATCHLIST_CHOICES:
+    watchlist = request.form.get("watchlist")
+    if watchlist == "":
+        remove_watchlist(title_id)
+        flash("Removed from watchlist.", "success")
+    elif watchlist in WATCHLIST_CHOICES:
         upsert_watchlist(title_id, watchlist)
+        flash("Watchlist updated.", "success")
+    else:
+        flash("Choose a valid watchlist status.", "warning")
 
     return redirect(url_for("title.title_info", title_id=title_id))

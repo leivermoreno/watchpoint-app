@@ -1,5 +1,5 @@
 from flask import g
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert
 from ..db import db
 from .models import Watchlist, WATCHLIST_CHOICES
@@ -27,6 +27,15 @@ def upsert_watchlist(title_id, status):
         .on_conflict_do_update(
             constraint="title_user_watchlist_uc", set_=dict(status=status)
         )
+    )
+    db.session.execute(stmt)
+    db.session.commit()
+
+
+def remove_watchlist(title_id):
+    stmt = delete(Watchlist).where(
+        Watchlist.title_id == title_id,
+        Watchlist.user_id == g.user.id,
     )
     db.session.execute(stmt)
     db.session.commit()

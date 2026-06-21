@@ -48,7 +48,7 @@
         id="watchlist"
         onchange="this.form.submit()"
       >
-        <option disabled {% if not watchlist %}selected{% endif %}>No current watchlist</option>
+        <option value="" {% if not watchlist %}selected{% endif %}>No current watchlist</option>
         {% for item in watchlist_choices %}
         <option {% if item == watchlist %}selected{% endif %} value="{{ item }}">
           {{ item.capitalize() }}
