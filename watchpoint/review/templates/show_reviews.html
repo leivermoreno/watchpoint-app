@@ -8,8 +8,12 @@
   </h1>
 
   <div class="reviews">
-    {% if not reviews %}
+    {% if not has_reviews %}
+    {% if title %}
+    <p>No one has reviewed {{ title.name }} yet.</p>
+    {% else %}
     <p>No one has reviewed a title yet.</p>
+    {% endif %}
     {% else %}
     <form class="mb-3 d-flex justify-content-center">
       <div>
@@ -38,6 +42,7 @@
     </div>
     {% endfor %} {% endif %}
 
+    {% if has_reviews %}
     <div class="mt-5 d-flex justify-content-between">
       <span><span class="fw-bold">Total pages:</span> {{ pages }}</span>
       <span>
@@ -54,6 +59,7 @@
         {% endif %}
       </span>
     </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

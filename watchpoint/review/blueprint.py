@@ -31,6 +31,7 @@ def show_reviews():
     title = get_title_info_or_404(title_id) if title_id else None
 
     review_count = get_review_count(title_id)
+    has_reviews = review_count > 0
     pages = math.ceil(review_count / REVIEW_PAGE_LIMIT)
     if page > pages:
         page = pages
@@ -47,6 +48,7 @@ def show_reviews():
         reviews=reviews,
         page=page,
         pages=pages,
+        has_reviews=has_reviews,
         title=title,
         title_id=title_id,
         sort_by=sort_by,
