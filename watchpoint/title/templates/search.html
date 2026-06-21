@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% block title %}Title Search{% endblock %}
+{% block content %}
 
 <style>
   .results {
@@ -20,7 +22,7 @@
   <div
     class="wrapper wrapper-40 h-100 d-flex flex-column justify-content-center align-items-center"
   >
-    <h1 class="mb-3">{% block title %}Title Search{% endblock %}</h1>
+    <h1 class="mb-3">Title Search</h1>
 
     <div class="w-100 position-relative">
       <form method="get" action="{{ url_for('title.index') }}">

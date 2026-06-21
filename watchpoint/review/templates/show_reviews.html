@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% from 'macros/review_votes.html' import review_vote_controls with context %}
+{% block title %}Reviews{% endblock %}
 {% block content %}
 <div class="container">
   <h1 class="mt-5 text-center">
-    {% block title %}Reviews{% endblock %}{% if title %} for {{ title.name
-    }}{% endif %}
+    Reviews{% if title %} for {{ title.name }}{% endif %}
   </h1>
 
   <div class="reviews">
