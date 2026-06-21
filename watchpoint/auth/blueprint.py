@@ -27,7 +27,7 @@ def signup():
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
-            flash("Welcome to Watchpoint. You can login now!.")
+            flash("Welcome to Watchpoint. You can login now!.", "success")
 
             return redirect(url_for("auth.login"))
 

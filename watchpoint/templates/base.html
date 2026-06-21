@@ -60,17 +60,30 @@
       </div>
     </nav>
 
-    {% with messages = get_flashed_messages() %} {% if messages %}
-    <div class="alert alert-primary alert-dismissible fade show" role="alert">
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
-      {{ messages[0] }}
-    </div>
-    {% endif %} {% endwith %}
+    {% set alert_classes = {
+      "message": "primary",
+      "success": "success",
+      "info": "info",
+      "warning": "warning",
+      "error": "danger",
+      "danger": "danger",
+    } %}
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% for category, message in messages %}
+      <div
+        class="alert alert-{{ alert_classes.get(category, 'primary') }} alert-dismissible fade show"
+        role="alert"
+      >
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+        {{ message }}
+      </div>
+      {% endfor %}
+    {% endwith %}
 
     <main class="flex-grow-1">{% block content %}{% endblock %}</main>
     <!-- Bootstrap JavaScript Libraries -->

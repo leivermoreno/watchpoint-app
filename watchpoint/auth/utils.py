@@ -48,7 +48,7 @@ def login_required(view):
                 if next_url
                 else url_for("auth.login")
             )
-            flash("Log in to continue.")
+            flash("Log in to continue.", "warning")
             return redirect(login_url)
 
         return view(*args, **kwargs)
