@@ -4,3 +4,17 @@
     margin-right: auto;
     transform: translateY(-10%);
 }
+
+.title-search-results {
+    max-height: 300px;
+}
+
+.search-submit-button {
+    width: 58px;
+    height: 58px;
+}
+
+.search-submit-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
