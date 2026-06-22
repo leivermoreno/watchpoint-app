@@ -5,17 +5,40 @@ from .models import Review, Vote
 from ..db import db
 
 REVIEW_PAGE_LIMIT = 10
-REVIEW_SORT_OPTIONS = ["newest", "oldest"]
+REVIEW_SORT_OPTIONS = {
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "most_voted": "Most voted",
+}
 
 
 def get_reviews(page, title_id, sort_by):
     offset = (page - 1) * REVIEW_PAGE_LIMIT
     stmt = select(Review).limit(REVIEW_PAGE_LIMIT).offset(offset)
-    sort_func = desc if sort_by == "newest" else asc
-    stmt = stmt.order_by(sort_func("created_at"))
+
+    if sort_by == "most_voted":
+        upvote_counts = (
+            select(
+                Vote.review_id,
+                func.sum(case((Vote.upvote == True, 1), else_=0)).label("upvotes"),
+            )
+            .group_by(Vote.review_id)
+            .subquery()
+        )
+        stmt = (
+            stmt.outerjoin(upvote_counts, Review.id == upvote_counts.c.review_id)
+            .order_by(
+                desc(func.coalesce(upvote_counts.c.upvotes, 0)),
+                desc(Review.created_at),
+                desc(Review.id),
+            )
+        )
+    else:
+        sort_func = desc if sort_by == "newest" else asc
+        stmt = stmt.order_by(sort_func(Review.created_at))
 
     if title_id:
-        stmt = stmt.filter_by(title_id=title_id)
+        stmt = stmt.where(Review.title_id == title_id)
 
     reviews = db.session.scalars(stmt).all()
     review_ids = [r.id for r in reviews]

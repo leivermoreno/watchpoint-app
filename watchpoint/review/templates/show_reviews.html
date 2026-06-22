@@ -19,8 +19,8 @@
           <label class="visually-hidden" for="reviewFilter">Sort by</label>
           <select class="form-select" name="sort_by" id="reviewFilter" onchange="this.form.submit()">
             <option disabled>Sort by:</option>
-            {% for so in sort_options %}
-            <option value="{{ so }}" {% if so == sort_by %}selected{% endif %}>{{ so.capitalize() }}</option>
+            {% for value, label in sort_options.items() %}
+            <option value="{{ value }}" {% if value == sort_by %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
           </select>
         </div>
