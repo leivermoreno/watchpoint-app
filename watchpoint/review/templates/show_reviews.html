@@ -4,34 +4,68 @@
 {% block content %}
 <div class="container page-shell">
   <div class="content-wide mx-auto">
-    <div class="page-header d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
-      <h1 class="page-title mb-0">
-        Reviews{% if title %}<span class="d-block fs-3 text-body-secondary mt-2">for {{ title.name }}</span>{% endif %}
-      </h1>
+    <div class="page-header">
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-end gap-3">
+        <h1 class="page-title mb-0">
+          Reviews{% if title %}<span class="d-block fs-3 text-body-secondary mt-2">for {{ title.name }}</span>{% endif %}
+        </h1>
 
-      {% if has_reviews %}
-      <form class="row row-cols-lg-auto g-2 align-items-center">
-        <input type="hidden" name="page" value="1">
-        {% if title_id %}
-        <input type="hidden" name="title_id" value="{{ title_id }}">
-        {% endif %}
-        <div class="col-12">
+        {% if has_reviews %}
+        <form class="review-sort-form" method="get" action="{{ url_for('review.show_reviews') }}">
+          <input type="hidden" name="page" value="1">
+          {% for name, value in review_filter_args.items() %}
+          <input type="hidden" name="{{ name }}" value="{{ value }}">
+          {% endfor %}
           <label class="visually-hidden" for="reviewFilter">Sort by</label>
           <select class="form-select" name="sort_by" id="reviewFilter" onchange="this.form.submit()">
-            <option disabled>Sort by:</option>
             {% for value, label in sort_options.items() %}
             <option value="{{ value }}" {% if value == sort_by %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
           </select>
-        </div>
-      </form>
-      {% endif %}
+        </form>
+        {% endif %}
+      </div>
+
+      <div class="review-search-panel position-relative mt-3">
+        <form method="get" action="{{ url_for('review.show_reviews') }}">
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control"
+              name="q"
+              id="reviewTitleSearchInput"
+              placeholder="Reviewed title"
+              value="{% if title %}{{ title.name }}{% else %}{{ review_title_query }}{% endif %}"
+              minlength="{{ search_min_length }}"
+              maxlength="{{ search_max_length }}"
+              autocomplete="off"
+              aria-controls="reviewTitleSearchResults"
+              hx-get="{{ url_for('review.autocomplete_review_titles') }}"
+              hx-trigger="input changed delay:250ms, search"
+              hx-target="#reviewTitleSearchResults"
+              hx-swap="outerHTML"
+              hx-sync="this:replace"
+            />
+            <label for="reviewTitleSearchInput">Reviewed title</label>
+          </div>
+        </form>
+        {% set results_id = 'reviewTitleSearchResults' %}
+        {% set results_endpoint = 'review.show_reviews' %}
+        {% set empty_message = 'No reviewed titles matching that search' %}
+        {% set titles = [] %}
+        {% set message = none %}
+        {% set show_results = false %}
+        {% set results_overlay = true %}
+        {% include "_autocomplete_results.html" %}
+      </div>
     </div>
 
     {% if not has_reviews %}
     <div class="soft-surface empty-state">
     {% if title %}
       <p class="mb-0">No one has reviewed {{ title.name }} yet.</p>
+    {% elif review_title_query %}
+      <p class="mb-0">No reviews found for "{{ review_title_query }}".</p>
     {% else %}
       <p class="mb-0">No one has reviewed a title yet.</p>
     {% endif %}
@@ -66,7 +100,7 @@
       <ul class="pagination mb-0">
         <li class="page-item{% if page <= 1 %} disabled{% endif %}">
         {% if page > 1 %}
-          <a class="page-link" href="{{ url_for('review.show_reviews', page=page-1, title_id=title_id, sort_by=sort_by) }}">Previous</a>
+          <a class="page-link" href="{{ url_for('review.show_reviews', page=page-1, sort_by=sort_by, **review_filter_args) }}">Previous</a>
         {% else %}
           <span class="page-link">Previous</span>
         {% endif %}
@@ -76,7 +110,7 @@
         </li>
         <li class="page-item{% if page >= pages %} disabled{% endif %}">
         {% if page < pages %}
-          <a class="page-link" href="{{ url_for('review.show_reviews', page=page+1, title_id=title_id, sort_by=sort_by) }}">Next</a>
+          <a class="page-link" href="{{ url_for('review.show_reviews', page=page+1, sort_by=sort_by, **review_filter_args) }}">Next</a>
         {% else %}
           <span class="page-link">Next</span>
         {% endif %}

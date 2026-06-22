@@ -2,9 +2,11 @@ from flask import g
 from sqlalchemy import select, delete, desc, asc, func, case, cast, Integer
 from sqlalchemy.dialects.postgresql import insert
 from .models import Review, Vote
+from ..title.models import Title
 from ..db import db
 
 REVIEW_PAGE_LIMIT = 10
+REVIEW_TITLE_SEARCH_LIMIT = 10
 REVIEW_SORT_OPTIONS = {
     "newest": "Newest",
     "oldest": "Oldest",
@@ -12,7 +14,19 @@ REVIEW_SORT_OPTIONS = {
 }
 
 
-def get_reviews(page, title_id, sort_by):
+def _apply_review_filter(stmt, title_id=None, query=None):
+    if title_id:
+        return stmt.where(Review.title_id == title_id)
+
+    if query:
+        return stmt.join(Title, Review.title_id == Title.id).where(
+            Title.name.ilike(f"%{query}%")
+        )
+
+    return stmt
+
+
+def get_reviews(page, title_id, sort_by, query=None):
     offset = (page - 1) * REVIEW_PAGE_LIMIT
     stmt = select(Review).limit(REVIEW_PAGE_LIMIT).offset(offset)
 
@@ -37,8 +51,7 @@ def get_reviews(page, title_id, sort_by):
         sort_func = desc if sort_by == "newest" else asc
         stmt = stmt.order_by(sort_func(Review.created_at))
 
-    if title_id:
-        stmt = stmt.where(Review.title_id == title_id)
+    stmt = _apply_review_filter(stmt, title_id, query)
 
     reviews = db.session.scalars(stmt).all()
     review_ids = [r.id for r in reviews]
@@ -71,12 +84,27 @@ def get_reviews(page, title_id, sort_by):
     return reviews
 
 
-def get_review_count(title_id):
+def get_review_count(title_id, query=None):
     stmt = select(func.count()).select_from(Review)
-    if title_id:
-        stmt = stmt.filter_by(title_id=title_id)
+    stmt = _apply_review_filter(stmt, title_id, query)
 
     return db.session.scalar(stmt)
+
+
+def get_reviewed_title_matches(query):
+    stmt = (
+        select(Title.id, Title.name)
+        .join(Review, Review.title_id == Title.id)
+        .where(Title.name.ilike(f"%{query}%"))
+        .distinct()
+        .order_by(Title.name.asc(), Title.id.asc())
+        .limit(REVIEW_TITLE_SEARCH_LIMIT)
+    )
+    return [
+        {"id": row.id, "name": row.name}
+        for row in db.session.execute(stmt)
+        if row.name
+    ]
 
 
 def get_title_review_by_user(title_id):

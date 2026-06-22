@@ -372,6 +372,15 @@ a:hover {
     gap: 1rem;
 }
 
+.review-search-panel {
+    max-width: 22rem;
+    width: 100%;
+}
+
+.review-sort-form {
+    width: 10rem;
+}
+
 .review-item {
     padding: 1rem;
 }
