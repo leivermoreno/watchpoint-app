@@ -7,6 +7,7 @@ from .services import (
     clean_search_query,
     get_autocomplete_titles,
     get_title_info_or_404,
+    search_query_length_error,
 )
 from ..watchlist.services import get_title_list_by_user
 from ..watchlist.models import WATCHLIST_CHOICES
@@ -49,20 +50,22 @@ def is_htmx_request():
 
 
 def search_results_context(query, query_submitted=False, htmx_request=False):
-    if len(query) < SEARCH_MIN_LENGTH:
+    error, message = search_query_length_error(query)
+
+    if error == "too_short":
         if query_submitted and not htmx_request:
             return dict(
                 titles=[],
-                message=f"Search must be at least {SEARCH_MIN_LENGTH} characters",
+                message=message,
                 show_results=True,
             )
 
         return dict(titles=[], message=None, show_results=False)
 
-    if len(query) > SEARCH_MAX_LENGTH:
+    if error == "too_long":
         return dict(
             titles=[],
-            message=f"Search must be {SEARCH_MAX_LENGTH} characters or fewer",
+            message=message,
             show_results=True,
         )
 

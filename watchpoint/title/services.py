@@ -35,6 +35,16 @@ def clean_search_query(value):
     return " ".join(value.split())
 
 
+def search_query_length_error(query):
+    if len(query) < SEARCH_MIN_LENGTH:
+        return "too_short", f"Search must be at least {SEARCH_MIN_LENGTH} characters"
+
+    if len(query) > SEARCH_MAX_LENGTH:
+        return "too_long", f"Search must be {SEARCH_MAX_LENGTH} characters or fewer"
+
+    return None, None
+
+
 def normalize_search_query(value):
     return clean_search_query(value).casefold()
 
@@ -51,10 +61,11 @@ def _is_fresh(fetched_at, ttl):
 
 def get_autocomplete_titles(s):
     query = clean_search_query(s)
-    if len(query) < SEARCH_MIN_LENGTH:
+    error, _ = search_query_length_error(query)
+    if error == "too_short":
         return None
 
-    if len(query) > SEARCH_MAX_LENGTH:
+    if error == "too_long":
         abort(400, description="Search query is too long.")
 
     cache_key = normalize_search_query(query)
