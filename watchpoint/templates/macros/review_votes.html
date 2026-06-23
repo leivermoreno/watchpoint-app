@@ -1,15 +1,16 @@
-{% macro review_vote_form(review, vote, label, count, active) %}
-<form method="post" action="{{ url_for('review.vote_review', review_id=review.id, **request.args) }}">
+{% macro review_vote_form(review, vote, label, count, active, next_url=none) %}
+<form method="post" action="{{ url_for('review.vote_review', review_id=review.id) }}">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-  <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}" />
+  <input type="hidden" name="next" value="{{ next_url or (request.full_path if request.query_string else request.path) }}" />
   <input type="hidden" name="vote" value="{{ vote }}" />
-  <button type="submit" class="btn btn-sm {% if active %}btn-primary{% else %}btn-outline-secondary{% endif %}">{{ label }} {{ count|default(0) }}</button>
+  <button type="submit" class="btn btn-sm {% if active %}btn-primary{% else %}btn-outline-secondary{% endif %}">{{ label }} {{ count|default(0, true) }}</button>
 </form>
 {% endmacro %}
 
-{% macro review_vote_controls(review) %}
+{% macro review_vote_controls(review, next_url=none) %}
+{% set vote_data = review.vote_data|default(none, true) %}
 <span class="review-vote-controls d-inline-flex flex-wrap gap-2">
-  {{ review_vote_form(review, 'up', 'Upvote', review.vote_data.upvotes, review.vote_data.user_upvote) }}
-  {{ review_vote_form(review, 'down', 'Downvote', review.vote_data.downvotes, review.vote_data.user_upvote == 0) }}
+  {{ review_vote_form(review, 'up', 'Upvote', vote_data.upvotes if vote_data else 0, vote_data.user_upvote if vote_data else false, next_url) }}
+  {{ review_vote_form(review, 'down', 'Downvote', vote_data.downvotes if vote_data else 0, vote_data and vote_data.user_upvote == 0, next_url) }}
 </span>
 {% endmacro %}

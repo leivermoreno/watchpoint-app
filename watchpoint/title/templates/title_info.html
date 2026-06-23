@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% from 'macros/forms.html' import textarea_field %}
+{% from 'macros/review_cards.html' import review_card with context %}
 {% block title %}{{ info.name }}{% endblock %}
 {% block content %}
 {% set genres = info.data.genre_names|default([], true) %}
@@ -84,7 +85,7 @@
         {% endif %}
         <a
           class="btn btn-primary"
-          href="{{ url_for('review.show_reviews', title_id=info.id) }}"
+          href="#reviews"
           role="button"
           >Read reviews</a
         >
@@ -159,5 +160,56 @@
       {% endif %}
     </div>
   </div>
+
+  <section id="reviews" class="section-block title-reviews-section">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-end gap-3 mb-3">
+      <div>
+        <h2 class="section-title mb-1">Reviews</h2>
+        {% if title_review_count %}
+        <p class="text-body-secondary mb-0">
+          {{ title_review_count }} {% if review %}other {% endif %}{{ "review" if title_review_count == 1 else "reviews" }}
+        </p>
+        {% endif %}
+      </div>
+
+      {% if title_review_count %}
+      <form
+        class="review-sort-form"
+        method="get"
+        action="{{ url_for('title.title_info', title_id=info.id) }}#reviews"
+      >
+        <label class="visually-hidden" for="titleReviewSort">Sort reviews</label>
+        <select class="form-select" name="sort_by" id="titleReviewSort" onchange="this.form.submit()">
+          {% for value, label in review_sort_options.items() %}
+          <option value="{{ value }}" {% if value == review_sort_by %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      {% endif %}
+    </div>
+
+    {% if title_reviews %}
+    {% set title_review_next_url = url_for('title.title_info', title_id=info.id, sort_by=review_sort_by) ~ '#reviews' %}
+    <div class="review-list">
+      {% for r in title_reviews %}
+      {{ review_card(r, show_title=false, vote_next=title_review_next_url) }}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="soft-surface empty-state">
+      <p class="mb-0">{% if g.user and review %}No other reviews yet.{% else %}No reviews yet.{% endif %}</p>
+    </div>
+    {% endif %}
+
+    {% if title_review_pages > 1 %}
+    <div class="mt-4">
+      <a
+        class="btn btn-outline-primary"
+        href="{{ url_for('review.show_reviews', title_id=info.id, sort_by=review_sort_by) }}"
+        >View all reviews</a
+      >
+    </div>
+    {% endif %}
+  </section>
 </div>
 {% endblock %}

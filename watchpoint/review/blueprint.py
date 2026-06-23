@@ -21,7 +21,7 @@ from .services import (
 )
 from .forms import ReviewForm
 from .models import Review
-from ..auth.utils import login_required
+from ..auth.utils import login_required, next_url_from_request
 from ..db import db
 
 
@@ -145,6 +145,4 @@ def vote_review(review_id):
 
     toggle_vote(review_id, vote == "up")
 
-    # page / sort_by / title_id ride along in the action's query string so the
-    # redirect lands back on the same filtered page.
-    return redirect(url_for("review.show_reviews", **request.args))
+    return redirect(next_url_from_request() or url_for("review.show_reviews"))

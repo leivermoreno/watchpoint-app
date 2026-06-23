@@ -1,0 +1,23 @@
+{% from 'macros/review_votes.html' import review_vote_controls with context %}
+
+{% macro review_card(r, show_title=true, vote_next=none) %}
+<article class="review-item soft-surface">
+  <div class="d-flex flex-column flex-sm-row justify-content-between gap-3">
+    <div>
+      <div class="review-meta">
+        Review by <span class="fw-bold">{{ r.user.nickname }}</span>
+        on
+        <time datetime="{{ r.created_at.isoformat() }}" class="local-date">{{ r.created_at.strftime('%B %d of %Y') }}</time>
+      </div>
+      {% if show_title %}
+      <h2 class="review-title">
+        <a href="{{ url_for('title.title_info', title_id=r.title_id) }}">{{ r.title.name }}</a>
+      </h2>
+      {% endif %}
+    </div>
+    <span class="rating-pill align-self-start">{{ r.stars }} stars</span>
+  </div>
+  <p class="review-comment">{{ r.comment }}</p>
+  {{ review_vote_controls(r, vote_next) }}
+</article>
+{% endmacro %}

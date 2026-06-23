@@ -14,19 +14,21 @@ REVIEW_SORT_OPTIONS = {
 }
 
 
-def _apply_review_filter(stmt, title_id=None, query=None):
+def _apply_review_filter(stmt, title_id=None, query=None, exclude_user_id=None):
     if title_id:
-        return stmt.where(Review.title_id == title_id)
-
-    if query:
-        return stmt.join(Title, Review.title_id == Title.id).where(
+        stmt = stmt.where(Review.title_id == title_id)
+    elif query:
+        stmt = stmt.join(Title, Review.title_id == Title.id).where(
             Title.name.ilike(f"%{query}%")
         )
+
+    if exclude_user_id is not None:
+        stmt = stmt.where(Review.user_id != exclude_user_id)
 
     return stmt
 
 
-def get_reviews(page, title_id, sort_by, query=None):
+def get_reviews(page, title_id, sort_by, query=None, exclude_user_id=None):
     offset = (page - 1) * REVIEW_PAGE_LIMIT
     stmt = select(Review).limit(REVIEW_PAGE_LIMIT).offset(offset)
 
@@ -51,7 +53,7 @@ def get_reviews(page, title_id, sort_by, query=None):
         sort_func = desc if sort_by == "newest" else asc
         stmt = stmt.order_by(sort_func(Review.created_at))
 
-    stmt = _apply_review_filter(stmt, title_id, query)
+    stmt = _apply_review_filter(stmt, title_id, query, exclude_user_id)
 
     reviews = db.session.scalars(stmt).all()
     review_ids = [r.id for r in reviews]
@@ -84,9 +86,9 @@ def get_reviews(page, title_id, sort_by, query=None):
     return reviews
 
 
-def get_review_count(title_id, query=None):
+def get_review_count(title_id, query=None, exclude_user_id=None):
     stmt = select(func.count()).select_from(Review)
-    stmt = _apply_review_filter(stmt, title_id, query)
+    stmt = _apply_review_filter(stmt, title_id, query, exclude_user_id)
 
     return db.session.scalar(stmt)
 

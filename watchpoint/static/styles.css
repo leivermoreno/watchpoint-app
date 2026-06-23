@@ -302,6 +302,10 @@ a:hover {
     margin-bottom: 0.75rem;
 }
 
+.title-reviews-section {
+    scroll-margin-top: 1rem;
+}
+
 .interaction-panel {
     padding: 1rem;
 }

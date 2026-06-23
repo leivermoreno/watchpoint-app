@@ -1,3 +1,5 @@
+import math
+
 from flask import Blueprint, g, make_response, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 
@@ -11,7 +13,13 @@ from .services import (
 )
 from ..watchlist.services import get_title_list_by_user
 from ..watchlist.models import WATCHLIST_CHOICES
-from ..review.services import get_title_review_by_user
+from ..review.services import (
+    REVIEW_PAGE_LIMIT,
+    REVIEW_SORT_OPTIONS,
+    get_review_count,
+    get_reviews,
+    get_title_review_by_user,
+)
 from ..review.forms import ReviewForm
 
 bp = Blueprint("title", __name__, template_folder="templates")
@@ -137,6 +145,20 @@ def render_title_info(title_id, review_form=None):
         not review or request.args.get("edit_review") or review_form.errors
     )
 
+    review_sort_by = request.args.get("sort_by")
+    if review_sort_by not in REVIEW_SORT_OPTIONS:
+        review_sort_by = "newest"
+
+    exclude_user_id = g.user.id if g.user else None
+    title_review_count = get_review_count(title_id, exclude_user_id=exclude_user_id)
+    title_review_pages = math.ceil(title_review_count / REVIEW_PAGE_LIMIT)
+    title_reviews = get_reviews(
+        1,
+        title_id,
+        review_sort_by,
+        exclude_user_id=exclude_user_id,
+    )
+
     return render_template(
         "title_info.html",
         info=title,
@@ -145,6 +167,11 @@ def render_title_info(title_id, review_form=None):
         review=review,
         form=review_form,
         show_review_form=show_review_form,
+        title_reviews=title_reviews,
+        title_review_count=title_review_count,
+        title_review_pages=title_review_pages,
+        review_sort_by=review_sort_by,
+        review_sort_options=REVIEW_SORT_OPTIONS,
     )
 
 
