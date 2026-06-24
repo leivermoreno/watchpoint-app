@@ -1,6 +1,10 @@
 import math
+
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 
+from ..auth.utils import login_required, next_url_from_request
+from ..db import db
+from ..title.blueprint import render_title_info
 from ..title.models import Title
 from ..title.services import (
     SEARCH_MAX_LENGTH,
@@ -9,21 +13,17 @@ from ..title.services import (
     get_title_info_or_404,
     search_query_length_error,
 )
-from ..title.blueprint import render_title_info
-from .services import (
-    upsert_review,
-    get_reviews,
-    get_review_count,
-    get_reviewed_title_matches,
-    REVIEW_PAGE_LIMIT,
-    REVIEW_SORT_OPTIONS,
-    toggle_vote,
-)
 from .forms import ReviewForm
 from .models import Review
-from ..auth.utils import login_required, next_url_from_request
-from ..db import db
-
+from .services import (
+    REVIEW_PAGE_LIMIT,
+    REVIEW_SORT_OPTIONS,
+    get_review_count,
+    get_reviewed_title_matches,
+    get_reviews,
+    toggle_vote,
+    upsert_review,
+)
 
 bp = Blueprint("review", __name__, url_prefix="/review", template_folder="templates")
 

@@ -1,8 +1,9 @@
 from flask import g
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert
+
 from ..db import db
-from .models import Watchlist, WATCHLIST_CHOICES
+from .models import WATCHLIST_CHOICES, Watchlist
 
 
 def get_watchlist_by_user(status=None):

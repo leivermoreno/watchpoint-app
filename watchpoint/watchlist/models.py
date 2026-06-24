@@ -1,7 +1,12 @@
-from sqlalchemy import ForeignKey, Enum, UniqueConstraint
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Enum, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ..db import db, TimestampMixin
+from ..db import TimestampMixin, db
+
+if TYPE_CHECKING:
+    from ..title.models import Title
 
 WATCHLIST_CHOICES = ("pending", "completed", "favorites")
 

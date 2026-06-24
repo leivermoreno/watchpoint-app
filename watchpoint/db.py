@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column

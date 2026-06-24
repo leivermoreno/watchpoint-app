@@ -1,21 +1,27 @@
-from typing import List
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from werkzeug.security import generate_password_hash, check_password_hash
-from ..db import db, TimestampMixin
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from ..db import TimestampMixin, db
+
+if TYPE_CHECKING:
+    from ..review.models import Review, Vote
+    from ..watchlist.models import Watchlist
 
 
 class User(TimestampMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     nickname: Mapped[str] = mapped_column(String(50), unique=True)
     _password: Mapped[str] = mapped_column("password_hash", String(255))
-    watchlist: Mapped[List["Watchlist"]] = relationship(
+    watchlist: Mapped[list["Watchlist"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True
     )
-    reviews: Mapped[List["Review"]] = relationship(
+    reviews: Mapped[list["Review"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", passive_deletes=True
     )
-    votes: Mapped[List["Vote"]] = relationship(
+    votes: Mapped[list["Vote"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True
     )
 

@@ -10,9 +10,10 @@ from flask import (
 )
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from .models import User
+
 from ..db import db
-from .forms import SignupForm, LoginForm
+from .forms import LoginForm, SignupForm
+from .models import User
 from .utils import next_url_from_request
 
 bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
@@ -43,7 +44,9 @@ def login():
     form = LoginForm()
     next_url = next_url_from_request()
     if form.validate_on_submit():
-        user = db.session.scalar(select(User).where(User.nickname == form.nickname.data))
+        user = db.session.scalar(
+            select(User).where(User.nickname == form.nickname.data)
+        )
         if user and user.check_password(form.password.data):
             session.clear()
             session["user_id"] = user.id

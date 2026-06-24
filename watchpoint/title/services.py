@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone
 
-from flask import abort, current_app
 import requests
+from flask import abort, current_app
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import insert
+
 from ..db import db
 from .models import Title, TitleSearchCache
 

@@ -1,7 +1,13 @@
-from typing import List
-from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint, Index, String
+from typing import TYPE_CHECKING
+
+from sqlalchemy import CheckConstraint, ForeignKey, Index, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from ..db import db, TimestampMixin
+
+from ..db import TimestampMixin, db
+
+if TYPE_CHECKING:
+    from ..auth.models import User
+    from ..title.models import Title
 
 
 class Review(TimestampMixin, db.Model):
@@ -12,7 +18,7 @@ class Review(TimestampMixin, db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
     user: Mapped["User"] = relationship(back_populates="reviews")
     title: Mapped["Title"] = relationship()
-    votes: Mapped[List["Vote"]] = relationship(
+    votes: Mapped[list["Vote"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True
     )
     __table_args__ = (

@@ -3,6 +3,16 @@ import math
 from flask import Blueprint, g, make_response, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 
+from ..review.forms import ReviewForm
+from ..review.services import (
+    REVIEW_PAGE_LIMIT,
+    REVIEW_SORT_OPTIONS,
+    get_review_count,
+    get_reviews,
+    get_title_review_by_user,
+)
+from ..watchlist.models import WATCHLIST_CHOICES
+from ..watchlist.services import get_title_list_by_user
 from .services import (
     SEARCH_MAX_LENGTH,
     SEARCH_MIN_LENGTH,
@@ -11,16 +21,6 @@ from .services import (
     get_title_info_or_404,
     search_query_length_error,
 )
-from ..watchlist.services import get_title_list_by_user
-from ..watchlist.models import WATCHLIST_CHOICES
-from ..review.services import (
-    REVIEW_PAGE_LIMIT,
-    REVIEW_SORT_OPTIONS,
-    get_review_count,
-    get_reviews,
-    get_title_review_by_user,
-)
-from ..review.forms import ReviewForm
 
 bp = Blueprint("title", __name__, template_folder="templates")
 

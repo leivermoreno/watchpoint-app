@@ -1,11 +1,9 @@
-from flask import Blueprint, flash, render_template, request, redirect, url_for
-
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from ..auth.utils import login_required
 from ..title.services import get_title_info_or_404
 from .models import WATCHLIST_CHOICES
 from .services import get_watchlist_by_user, remove_watchlist, upsert_watchlist
-
 
 bp = Blueprint(
     "watchlist", __name__, url_prefix="/watchlist", template_folder="templates"

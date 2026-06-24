@@ -35,6 +35,12 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
+For development tooling, install the dev requirements instead:
+
+```sh
+pip install -r requirements-dev.txt
+```
+
 2. Create the PostgreSQL role and database:
 
 - Create a `watchpoint` role **with a password**.
@@ -86,4 +92,16 @@ For production, serve the factory with a WSGI server, e.g.:
 
 ```sh
 gunicorn 'watchpoint:create_app()'
+```
+
+## Development checks
+
+Ruff is used for linting, import sorting, and formatting:
+
+```sh
+ruff check .
+ruff check --fix .
+ruff check --select I --fix .
+ruff format .
+ruff format --check .
 ```

@@ -1,9 +1,10 @@
 from flask import g
-from sqlalchemy import select, delete, desc, asc, func, case, cast, Integer
+from sqlalchemy import Integer, asc, case, cast, delete, desc, func, select
 from sqlalchemy.dialects.postgresql import insert
-from .models import Review, Vote
-from ..title.models import Title
+
 from ..db import db
+from ..title.models import Title
+from .models import Review, Vote
 
 REVIEW_PAGE_LIMIT = 10
 REVIEW_TITLE_SEARCH_LIMIT = 10
@@ -36,18 +37,17 @@ def get_reviews(page, title_id, sort_by, query=None, exclude_user_id=None):
         upvote_counts = (
             select(
                 Vote.review_id,
-                func.sum(case((Vote.upvote == True, 1), else_=0)).label("upvotes"),
+                func.sum(case((Vote.upvote.is_(True), 1), else_=0)).label("upvotes"),
             )
             .group_by(Vote.review_id)
             .subquery()
         )
-        stmt = (
-            stmt.outerjoin(upvote_counts, Review.id == upvote_counts.c.review_id)
-            .order_by(
-                desc(func.coalesce(upvote_counts.c.upvotes, 0)),
-                desc(Review.created_at),
-                desc(Review.id),
-            )
+        stmt = stmt.outerjoin(
+            upvote_counts, Review.id == upvote_counts.c.review_id
+        ).order_by(
+            desc(func.coalesce(upvote_counts.c.upvotes, 0)),
+            desc(Review.created_at),
+            desc(Review.id),
         )
     else:
         sort_func = desc if sort_by == "newest" else asc
@@ -63,8 +63,8 @@ def get_reviews(page, title_id, sort_by, query=None, exclude_user_id=None):
     vote_stmt = (
         select(
             Vote.review_id,
-            func.sum(case((Vote.upvote == True, 1), else_=0)).label("upvotes"),
-            func.sum(case((Vote.upvote == False, 1), else_=0)).label("downvotes"),
+            func.sum(case((Vote.upvote.is_(True), 1), else_=0)).label("upvotes"),
+            func.sum(case((Vote.upvote.is_(False), 1), else_=0)).label("downvotes"),
         )
         .where(Vote.review_id.in_(review_ids))
         .group_by(Vote.review_id)
@@ -103,9 +103,7 @@ def get_reviewed_title_matches(query):
         .limit(REVIEW_TITLE_SEARCH_LIMIT)
     )
     return [
-        {"id": row.id, "name": row.name}
-        for row in db.session.execute(stmt)
-        if row.name
+        {"id": row.id, "name": row.name} for row in db.session.execute(stmt) if row.name
     ]
 
 

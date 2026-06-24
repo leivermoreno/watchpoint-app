@@ -1,8 +1,10 @@
 import os
+
 from dotenv import load_dotenv
 from flask import Flask
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
+
 from .db import db
 
 load_dotenv()
@@ -21,7 +23,8 @@ def create_app():
         # keep pooled connections healthy across networked databases
         SQLALCHEMY_ENGINE_OPTIONS={
             "pool_pre_ping": True,
-            "pool_recycle": 1800,  # recycle conns older than 30 min; keep under the DB/proxy idle timeout
+            # recycle connections before common DB/proxy idle timeouts
+            "pool_recycle": 1800,
             # return timestamptz values as UTC so the backend works only in UTC
             "connect_args": {"options": "-c timezone=utc"},
         },
