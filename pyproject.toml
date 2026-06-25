@@ -3,3 +3,9 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+addopts = "-ra --strict-config --strict-markers"
+testpaths = ["tests"]
+python_files = ["test_*.py"]

@@ -96,6 +96,14 @@ gunicorn 'watchpoint:create_app()'
 
 ## Development checks
 
+Tests are run with pytest:
+
+```sh
+python -m pytest
+python -m pytest tests/test_auth_utils.py
+python -m pytest tests/test_auth_utils.py::test_normalize_next_url_accepts_safe_relative_url
+```
+
 Ruff is used for linting, import sorting, and formatting:
 
 ```sh
