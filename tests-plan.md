@@ -57,25 +57,25 @@ tests. Keep early slices database-free and network-free.
 
 ## 5. Add Thin Route Tests With Monkeypatching
 
-- `watchlist.get_watchlist()`:
-  - Normalizes invalid status values to `all`.
-  - Passes `None` to the service for the all-list view.
-- `watchlist.modify_watchlist()`:
-  - Calls `upsert_watchlist` for valid statuses.
-  - Calls `remove_watchlist` for empty status.
-  - Flashes a warning for invalid status.
-- `review.create_review()`:
-  - Valid form calls `upsert_review`.
-  - Invalid form re-renders the title page through `render_title_info`.
-- `review.vote_review()`:
-  - Rejects bad vote values.
-  - Calls `toggle_vote`.
-  - Respects a safe `next`.
-- `review.show_reviews()`:
-  - Normalizes invalid page values.
-  - Normalizes invalid sort values.
-  - Handles too-long queries.
-- Keep these mostly DB-free by monkeypatching service calls and template
+- [x] `watchlist.get_watchlist()`:
+  - [x] Normalizes invalid status values to `all`.
+  - [x] Passes `None` to the service for the all-list view.
+- [x] `watchlist.modify_watchlist()`:
+  - [x] Calls `upsert_watchlist` for valid statuses.
+  - [x] Calls `remove_watchlist` for empty status.
+  - [x] Flashes a warning for invalid status.
+- [x] `review.create_review()`:
+  - [x] Valid form calls `upsert_review`.
+  - [x] Invalid form re-renders the title page through `render_title_info`.
+- [x] `review.vote_review()`:
+  - [x] Rejects bad vote values.
+  - [x] Calls `toggle_vote`.
+  - [x] Respects a safe `next`.
+- [x] `review.show_reviews()`:
+  - [x] Normalizes invalid page values.
+  - [x] Normalizes invalid sort values.
+  - [x] Handles too-long queries.
+- [x] Keep these mostly DB-free by monkeypatching service calls and template
   rendering.
 
 ## 6. Add PostgreSQL Integration Tests
