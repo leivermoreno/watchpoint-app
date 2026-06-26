@@ -7,5 +7,6 @@ select = ["E", "F", "I"]
 [tool.pytest.ini_options]
 minversion = "9.0"
 addopts = "-ra --strict-config --strict-markers"
+pythonpath = ["."]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
