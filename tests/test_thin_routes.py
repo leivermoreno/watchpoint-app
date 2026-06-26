@@ -320,6 +320,8 @@ def test_show_reviews_handles_too_long_queries(route_app, monkeypatch):
         lambda *args, **kwargs: pytest.fail("unexpected reviews query"),
     )
 
-    response = route_app.test_client().get(f"/review/?q={'x' * (SEARCH_MAX_LENGTH + 1)}")
+    response = route_app.test_client().get(
+        f"/review/?q={'x' * (SEARCH_MAX_LENGTH + 1)}"
+    )
 
     assert response.status_code == 400

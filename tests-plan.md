@@ -84,26 +84,26 @@ Do not use SQLite for these. The app uses PostgreSQL `JSONB` and
 PostgreSQL-specific `ON CONFLICT` upserts, so SQLite tests would verify different
 behavior.
 
-- Add a real `create_app()` fixture with:
-  - Test environment variables.
-  - `WTF_CSRF_ENABLED = False`.
-  - A separate test PostgreSQL database.
-- Cover:
-  - Auth signup and login.
-  - Title upsert and search-cache upsert.
-  - Title/search cache fallback behavior where unit tests cannot cover the
+- [x] Add a real `create_app()` fixture with:
+  - [x] Test environment variables.
+  - [x] `WTF_CSRF_ENABLED = False`.
+  - [x] A separate test PostgreSQL database.
+- [x] Cover:
+  - [x] Auth signup and login.
+  - [x] Title upsert and search-cache upsert.
+  - [x] Title/search cache fallback behavior where unit tests cannot cover the
     database constraint/update semantics.
-  - Watchlist upsert and remove.
-  - Review upsert.
-  - Vote toggle.
-  - Review sorting and counts.
-- Keep this slice small. It should prove the PostgreSQL-specific schema and
+  - [x] Watchlist upsert and remove.
+  - [x] Review upsert.
+  - [x] Vote toggle.
+  - [x] Review sorting and counts.
+- [x] Keep this slice small. It should prove the PostgreSQL-specific schema and
   upsert behavior, not duplicate every route test.
 
 ## Suggested Next Slice
 
-Test title service logic without DB or network by monkeypatching database and
-Watchmode calls while covering the service behavior listed in slice 3.
+Add a PostgreSQL migration smoke test if you want coverage for Alembic upgrade
+files in addition to the model-created schema used by the integration tests.
 
 ## Running Tests
 
@@ -112,4 +112,11 @@ Install development dependencies, then run pytest:
 ```sh
 pip install -r requirements-dev.txt
 pytest
+```
+
+PostgreSQL integration tests require an explicit throwaway database URI. The
+database name must include `test` because the fixture drops and recreates tables:
+
+```sh
+export WATCHPOINT_TEST_DATABASE_URI=postgresql+psycopg2://user:pass@localhost:5432/watchpoint_test
 ```

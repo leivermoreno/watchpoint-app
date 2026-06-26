@@ -104,6 +104,21 @@ python -m pytest tests/test_auth_utils.py
 python -m pytest tests/test_auth_utils.py::test_normalize_next_url_accepts_safe_relative_url
 ```
 
+PostgreSQL integration tests use a separate throwaway database. Create it once:
+
+```sh
+createdb -O watchpoint watchpoint_test
+```
+
+Then set the test database URI before running pytest:
+
+```sh
+export WATCHPOINT_TEST_DATABASE_URI=postgresql+psycopg2://watchpoint:<password>@localhost:5432/watchpoint_test
+```
+
+The test database name must include `test`; the integration fixture drops and
+recreates tables in that database.
+
 Ruff is used for linting, import sorting, and formatting:
 
 ```sh
