@@ -203,10 +203,8 @@ def get_sources(title_id, abort_on_error=True):
                 continue
 
             provider = src.get("name")
-            if src.get("region") == "US" and provider not in providers:
+            if src.get("region") == "US" and provider and provider not in providers:
                 result_filtered.append(src)
-
-            if provider:
                 providers.add(provider)
 
     return result_filtered

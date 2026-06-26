@@ -31,19 +31,19 @@ tests. Keep early slices database-free and network-free.
 
 ## 3. Test Title Service Logic Without DB or Network
 
-- `Title.values_from_watchmode()`.
-- `_is_fresh()` with timezone-aware and naive timestamps.
-- `get_sources()` filtering:
-  - US-only rows.
-  - Duplicate providers.
-  - Malformed rows.
-- `get_title_data()` rejecting bad or mismatched IDs and using fallback sources.
-- `get_title_info_or_404()` cache behavior:
-  - Fresh cached title skips Watchmode.
-  - Stale cached title falls back to cached data when refresh fails.
-- `get_autocomplete_titles()` cache behavior:
-  - Fresh cached search returns immediately.
-  - Stale cached search falls back to cached results when Watchmode fails.
+- [x] `Title.values_from_watchmode()`.
+- [x] `_is_fresh()` with timezone-aware and naive timestamps.
+- [x] `get_sources()` filtering:
+  - [x] US-only rows.
+  - [x] Duplicate providers.
+  - [x] Malformed rows.
+- [x] `get_title_data()` rejecting bad or mismatched IDs and using fallback sources.
+- [x] `get_title_info_or_404()` cache behavior:
+  - [x] Fresh cached title skips Watchmode.
+  - [x] Stale cached title falls back to cached data when refresh fails.
+- [x] `get_autocomplete_titles()` cache behavior:
+  - [x] Fresh cached search returns immediately.
+  - [x] Stale cached search falls back to cached results when Watchmode fails.
 
 ## 4. Test Forms and Model Methods
 
