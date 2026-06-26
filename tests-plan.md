@@ -20,14 +20,14 @@ tests. Keep early slices database-free and network-free.
 
 ## 2. Test Title Search Route Logic Without DB or Network
 
-- Test `search_results_context()` for:
-  - Short query.
-  - Too-long query.
-  - Valid result.
-  - Watchmode `503` fallback message.
-- Test `index()` HTMX behavior, especially empty query setting
+- [x] Test `search_results_context()` for:
+  - [x] Short query.
+  - [x] Too-long query.
+  - [x] Valid result.
+  - [x] Watchmode `503` fallback message.
+- [x] Test `index()` HTMX behavior, especially empty query setting
   `HX-Replace-Url`.
-- Monkeypatch `get_autocomplete_titles`; do not call Watchmode.
+- [x] Monkeypatch `get_autocomplete_titles`; do not call Watchmode.
 
 ## 3. Test Title Service Logic Without DB or Network
 
@@ -102,9 +102,8 @@ behavior.
 
 ## Suggested Next Slice
 
-Test title search route logic without DB or network by monkeypatching
-`get_autocomplete_titles` and covering the route-context behavior listed in
-slice 2.
+Test title service logic without DB or network by monkeypatching database and
+Watchmode calls while covering the service behavior listed in slice 3.
 
 ## Running Tests
 
