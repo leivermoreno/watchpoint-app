@@ -47,12 +47,12 @@ tests. Keep early slices database-free and network-free.
 
 ## 4. Test Forms and Model Methods
 
-- `User.set_password()` and `User.check_password()`.
-- Confirm passwords are not stored as plaintext.
-- `ReviewForm` validation for comment length and required stars.
-- `ReviewForm` coercion of `stars` to `int`.
-- `ReviewForm` rejects out-of-range stars.
-- Do not add broad auth form length tests unless those forms get custom logic;
+- [x] `User.set_password()` and `User.check_password()`.
+- [x] Confirm passwords are not stored as plaintext.
+- [x] `ReviewForm` validation for comment length and required stars.
+- [x] `ReviewForm` coercion of `stars` to `int`.
+- [x] `ReviewForm` rejects out-of-range stars.
+- [x] Do not add broad auth form length tests unless those forms get custom logic;
   they mostly retest WTForms validators.
 
 ## 5. Add Thin Route Tests With Monkeypatching
