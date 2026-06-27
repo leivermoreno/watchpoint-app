@@ -1,13 +1,51 @@
+from pathlib import Path
+
 import pytest
+from flask import Blueprint, g
+from jinja2 import ChoiceLoader, FileSystemLoader
 from werkzeug.exceptions import ServiceUnavailable
 
 from watchpoint.title import blueprint as title_blueprint
 from watchpoint.title.services import SEARCH_MAX_LENGTH, SEARCH_MIN_LENGTH
 
+PROJECT_TEMPLATES = Path(__file__).resolve().parents[1] / "watchpoint" / "templates"
+
 
 @pytest.fixture
 def title_app(app):
+    app.config["TEST_USER"] = None
+    app.jinja_loader = ChoiceLoader(
+        [app.jinja_loader, FileSystemLoader(PROJECT_TEMPLATES)]
+    )
+
+    auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+    @auth_bp.get("/login")
+    def login():
+        return "login"
+
+    @auth_bp.get("/signup")
+    def signup():
+        return "signup"
+
+    @auth_bp.get("/logout")
+    def logout():
+        return "logout"
+
+    review_bp = Blueprint("review", __name__, url_prefix="/review")
+
+    @review_bp.get("/")
+    def show_reviews():
+        return "reviews"
+
+    @app.before_request
+    def load_test_user():
+        g.user = app.config["TEST_USER"]
+
     app.register_blueprint(title_blueprint.bp)
+    app.add_url_rule("/", "index", title_blueprint.index)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(review_bp)
     return app
 
 
@@ -174,3 +212,30 @@ def test_index_htmx_empty_query_replaces_url(title_app, monkeypatch):
             "show_results": False,
         }
     ]
+
+
+def test_index_full_page_renders_template_contract(title_app, monkeypatch):
+    autocomplete_calls = []
+
+    def fake_get_autocomplete_titles(query):
+        autocomplete_calls.append(query)
+        return [{"id": "42", "name": "Heat"}]
+
+    monkeypatch.setattr(
+        title_blueprint,
+        "get_autocomplete_titles",
+        fake_get_autocomplete_titles,
+    )
+
+    response = title_app.test_client().get("/?q=  Heat  ")
+
+    assert response.status_code == 200
+    assert autocomplete_calls == ["Heat"]
+    assert 'value="Heat"' in response.text
+    assert f'minlength="{SEARCH_MIN_LENGTH}"' in response.text
+    assert f'maxlength="{SEARCH_MAX_LENGTH}"' in response.text
+    assert 'href="/42"' in response.text
+    assert 'href="/"' in response.text
+    assert 'href="/review/"' in response.text
+    assert 'href="/auth/login"' in response.text
+    assert 'href="/auth/signup"' in response.text
