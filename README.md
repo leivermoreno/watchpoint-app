@@ -104,7 +104,8 @@ python -m pytest tests/test_auth_utils.py
 python -m pytest tests/test_auth_utils.py::test_normalize_next_url_accepts_safe_relative_url
 ```
 
-PostgreSQL integration tests use a separate throwaway database. Create it once:
+PostgreSQL integration tests are required for a passing test run and use a
+separate throwaway database. Create it once:
 
 ```sh
 createdb -O watchpoint watchpoint_test
@@ -120,7 +121,9 @@ export WATCHPOINT_ALLOW_DESTRUCTIVE_TESTS=1
 The test database name must be `watchpoint_test` or start with
 `watchpoint_test_`. The integration fixture drops all tables in that database
 and applies the Alembic migrations from scratch, so
-`WATCHPOINT_ALLOW_DESTRUCTIVE_TESTS=1` is required as an explicit opt-in.
+`WATCHPOINT_ALLOW_DESTRUCTIVE_TESTS=1` is required as an explicit opt-in. If the
+database URI, opt-in, or database connection is missing, pytest fails instead of
+skipping the PostgreSQL coverage.
 
 Ruff is used for linting, import sorting, and formatting:
 

@@ -82,18 +82,24 @@ def title_payload(title_id, title, **overrides):
 def postgresql_test_database_uri():
     uri = os.environ.get("WATCHPOINT_TEST_DATABASE_URI")
     if not uri:
-        pytest.skip(
-            "Set WATCHPOINT_TEST_DATABASE_URI to run PostgreSQL integration tests."
+        pytest.fail(
+            "Set WATCHPOINT_TEST_DATABASE_URI to run required PostgreSQL "
+            "integration tests.",
+            pytrace=False,
         )
 
     url = make_url(uri)
     if not url.drivername.startswith("postgresql"):
-        pytest.skip("WATCHPOINT_TEST_DATABASE_URI must use a PostgreSQL driver.")
+        pytest.fail(
+            "WATCHPOINT_TEST_DATABASE_URI must use a PostgreSQL driver.",
+            pytrace=False,
+        )
 
     if os.environ.get(DESTRUCTIVE_TEST_OPT_IN_ENV) != "1":
-        pytest.skip(
+        pytest.fail(
             f"Set {DESTRUCTIVE_TEST_OPT_IN_ENV}=1 to run PostgreSQL integration "
-            "tests that drop all tables in WATCHPOINT_TEST_DATABASE_URI."
+            "tests that drop all tables in WATCHPOINT_TEST_DATABASE_URI.",
+            pytrace=False,
         )
 
     database = (url.database or "").lower()
@@ -127,7 +133,10 @@ def integration_app(monkeypatch, postgresql_test_database_uri):
         try:
             db.session.execute(text("SELECT 1"))
         except OperationalError as exc:
-            pytest.skip(f"PostgreSQL test database is unavailable: {exc.orig}")
+            pytest.fail(
+                f"PostgreSQL test database is unavailable: {exc.orig}",
+                pytrace=False,
+            )
         db.session.rollback()
 
         drop_reflected_tables()
