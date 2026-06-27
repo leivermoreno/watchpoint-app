@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
@@ -22,6 +23,47 @@ from watchpoint.watchlist import services as watchlist_services
 from watchpoint.watchlist.models import Watchlist
 
 MIGRATIONS_DIR = Path(__file__).resolve().parents[1] / "migrations"
+DESTRUCTIVE_TEST_OPT_IN_ENV = "WATCHPOINT_ALLOW_DESTRUCTIVE_TESTS"
+TEST_DATABASE_NAME_RE = re.compile(r"^watchpoint_test(?:_[a-z0-9]+)*$")
+
+
+def is_safe_postgresql_test_database_name(database):
+    return TEST_DATABASE_NAME_RE.fullmatch((database or "").lower()) is not None
+
+
+@pytest.mark.parametrize(
+    "database",
+    [
+        "watchpoint_test",
+        "watchpoint_test_local",
+        "watchpoint_test_ci_42",
+        "WATCHPOINT_TEST_CI",
+    ],
+)
+def test_postgresql_database_name_guard_accepts_dedicated_watchpoint_test_names(
+    database,
+):
+    assert is_safe_postgresql_test_database_name(database)
+
+
+@pytest.mark.parametrize(
+    "database",
+    [
+        None,
+        "",
+        "contest",
+        "latest",
+        "my_test",
+        "test_watchpoint",
+        "watchpoint",
+        "watchpoint_testing",
+        "watchpoint_test-1",
+        "watchpoint_test_",
+        "watchpoint_test__local",
+    ],
+)
+def test_postgresql_database_name_guard_rejects_ambiguous_database_names(database):
+    assert not is_safe_postgresql_test_database_name(database)
 
 
 def title_payload(title_id, title, **overrides):
@@ -48,11 +90,18 @@ def postgresql_test_database_uri():
     if not url.drivername.startswith("postgresql"):
         pytest.skip("WATCHPOINT_TEST_DATABASE_URI must use a PostgreSQL driver.")
 
+    if os.environ.get(DESTRUCTIVE_TEST_OPT_IN_ENV) != "1":
+        pytest.skip(
+            f"Set {DESTRUCTIVE_TEST_OPT_IN_ENV}=1 to run PostgreSQL integration "
+            "tests that drop all tables in WATCHPOINT_TEST_DATABASE_URI."
+        )
+
     database = (url.database or "").lower()
-    if "test" not in database:
+    if not is_safe_postgresql_test_database_name(database):
         pytest.fail(
             "WATCHPOINT_TEST_DATABASE_URI must point to a dedicated test database "
-            "with 'test' in its name because these tests drop and migrate tables."
+            "named watchpoint_test or watchpoint_test_<suffix> because these tests "
+            "drop and migrate tables."
         )
 
     return uri

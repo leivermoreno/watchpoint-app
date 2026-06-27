@@ -110,14 +110,17 @@ PostgreSQL integration tests use a separate throwaway database. Create it once:
 createdb -O watchpoint watchpoint_test
 ```
 
-Then set the test database URI before running pytest:
+Then set the test database URI and destructive-test opt-in before running pytest:
 
 ```sh
 export WATCHPOINT_TEST_DATABASE_URI=postgresql+psycopg2://watchpoint:<password>@localhost:5432/watchpoint_test
+export WATCHPOINT_ALLOW_DESTRUCTIVE_TESTS=1
 ```
 
-The test database name must include `test`; the integration fixture drops all
-tables in that database and applies the Alembic migrations from scratch.
+The test database name must be `watchpoint_test` or start with
+`watchpoint_test_`. The integration fixture drops all tables in that database
+and applies the Alembic migrations from scratch, so
+`WATCHPOINT_ALLOW_DESTRUCTIVE_TESTS=1` is required as an explicit opt-in.
 
 Ruff is used for linting, import sorting, and formatting:
 
