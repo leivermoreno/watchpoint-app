@@ -78,6 +78,13 @@ def title_payload(title_id, title, **overrides):
     return payload
 
 
+def uri_with_non_utc_session_timezone(uri):
+    url = make_url(uri).update_query_dict(
+        {"options": "-c timezone=America/New_York"}
+    )
+    return url.render_as_string(hide_password=False)
+
+
 @pytest.fixture
 def postgresql_test_database_uri():
     uri = os.environ.get("WATCHPOINT_TEST_DATABASE_URI")
@@ -123,7 +130,10 @@ def drop_reflected_tables():
 @pytest.fixture
 def integration_app(monkeypatch, postgresql_test_database_uri):
     monkeypatch.setenv("WATCHPOINT_SECRET_KEY", "test-secret-key")
-    monkeypatch.setenv("WATCHPOINT_DATABASE_URI", postgresql_test_database_uri)
+    monkeypatch.setenv(
+        "WATCHPOINT_DATABASE_URI",
+        uri_with_non_utc_session_timezone(postgresql_test_database_uri),
+    )
     monkeypatch.setenv("WATCHPOINT_WATCHMODE_API_KEY", "test-api-key")
 
     app = create_app()
@@ -147,6 +157,16 @@ def integration_app(monkeypatch, postgresql_test_database_uri):
     with app.app_context():
         drop_reflected_tables()
         db.engine.dispose()
+
+
+def test_postgresql_connection_timezone_is_utc(integration_app):
+    with integration_app.app_context():
+        session_timezone = db.session.scalar(text("SHOW timezone"))
+        db_now = db.session.scalar(select(func.now()))
+
+        assert session_timezone == "UTC"
+        assert db_now.tzinfo is not None
+        assert db_now.utcoffset() == timedelta(0)
 
 
 def create_user(nickname, password="correct horse battery staple"):
