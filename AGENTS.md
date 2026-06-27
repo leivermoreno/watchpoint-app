@@ -10,6 +10,8 @@ flask --app watchpoint run
 
 Required env vars (see README): `WATCHPOINT_SECRET_KEY`, `WATCHPOINT_DATABASE_URI`, `WATCHPOINT_WATCHMODE_API_KEY`. None have defaults — all three are read via `os.environ[...]`, so a missing one raises `KeyError` at startup. For local dev they can live in a gitignored `.env` (loaded by `load_dotenv()` via python-dotenv; see `.env.example`). `WATCHPOINT_DATABASE_URI` is a TCP DSN of the form `postgresql+psycopg2://user:pass@host:5432/watchpoint?sslmode=require`; `app.py` sets `SQLALCHEMY_ENGINE_OPTIONS` with `pool_pre_ping`/`pool_recycle` for resilience across networked (cloud/Docker) databases, and pins the DB session timezone to UTC via `connect_args` (`-c timezone=utc`) so every `timestamptz` read comes back UTC-aware (see "Timestamps & timezones" below).
 
+When checking local test configuration, remember that `printenv` only shows exported shell variables; it does not read `.env`. Because importing `watchpoint` loads `.env`, pytest may see values that `printenv` does not. Verify `.env` values with `python-dotenv`/`dotenv_values()` or by running the focused pytest target, and distinguish a missing `WATCHPOINT_TEST_DATABASE_URI` from a missing `WATCHPOINT_ALLOW_DESTRUCTIVE_TESTS=1` opt-in.
+
 There is currently no test suite, linter, or formatter configured.
 
 ## Architecture
