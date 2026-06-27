@@ -312,12 +312,20 @@ def test_review_upsert_uses_postgresql_conflict_constraint(integration_app):
         with integration_app.test_request_context("/"):
             g.user = SimpleNamespace(id=user_id)
             review_services.upsert_review(42, "This first review is long enough.", 3)
+
+            review = db.session.scalar(select(Review))
+            assert review is not None
+            old_updated_at = datetime.now(timezone.utc) - timedelta(days=1)
+            review.updated_at = old_updated_at
+            db.session.commit()
+
             review_services.upsert_review(42, "This edited review is better.", 5)
 
         review_rows = db.session.scalars(select(Review)).all()
         assert len(review_rows) == 1
         assert review_rows[0].comment == "This edited review is better."
         assert review_rows[0].stars == 5
+        assert review_rows[0].updated_at > old_updated_at
 
 
 def test_vote_toggle_inserts_deletes_and_updates_one_vote_row(integration_app):
