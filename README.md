@@ -116,8 +116,8 @@ Then set the test database URI before running pytest:
 export WATCHPOINT_TEST_DATABASE_URI=postgresql+psycopg2://watchpoint:<password>@localhost:5432/watchpoint_test
 ```
 
-The test database name must include `test`; the integration fixture drops and
-recreates tables in that database.
+The test database name must include `test`; the integration fixture drops all
+tables in that database and applies the Alembic migrations from scratch.
 
 Ruff is used for linting, import sorting, and formatting:
 

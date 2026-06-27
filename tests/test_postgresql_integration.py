@@ -1,11 +1,13 @@
 import os
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from types import SimpleNamespace
 from urllib.parse import urlsplit
 
 import pytest
 from flask import g
-from sqlalchemy import func, select, text, update
+from flask_migrate import upgrade as alembic_upgrade
+from sqlalchemy import MetaData, func, select, text, update
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import OperationalError
 
@@ -18,6 +20,8 @@ from watchpoint.title import services as title_services
 from watchpoint.title.models import Title, TitleSearchCache
 from watchpoint.watchlist import services as watchlist_services
 from watchpoint.watchlist.models import Watchlist
+
+MIGRATIONS_DIR = Path(__file__).resolve().parents[1] / "migrations"
 
 
 def title_payload(title_id, title, **overrides):
@@ -48,10 +52,17 @@ def postgresql_test_database_uri():
     if "test" not in database:
         pytest.fail(
             "WATCHPOINT_TEST_DATABASE_URI must point to a dedicated test database "
-            "with 'test' in its name because these tests drop and recreate tables."
+            "with 'test' in its name because these tests drop and migrate tables."
         )
 
     return uri
+
+
+def drop_reflected_tables():
+    db.session.remove()
+    metadata = MetaData()
+    metadata.reflect(bind=db.engine)
+    metadata.drop_all(bind=db.engine)
 
 
 @pytest.fixture
@@ -70,14 +81,13 @@ def integration_app(monkeypatch, postgresql_test_database_uri):
             pytest.skip(f"PostgreSQL test database is unavailable: {exc.orig}")
         db.session.rollback()
 
-        db.drop_all()
-        db.create_all()
+        drop_reflected_tables()
+        alembic_upgrade(directory=str(MIGRATIONS_DIR))
 
     yield app
 
     with app.app_context():
-        db.session.remove()
-        db.drop_all()
+        drop_reflected_tables()
         db.engine.dispose()
 
 
