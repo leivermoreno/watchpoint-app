@@ -36,4 +36,4 @@ USER watchpoint
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--access-logfile", "-", "--error-logfile", "-", "--no-control-socket", "watchpoint:create_app()"]
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-8000} --access-logfile - --error-logfile - --no-control-socket 'watchpoint:create_app()'"]

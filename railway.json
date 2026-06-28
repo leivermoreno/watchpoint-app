@@ -1,0 +1,8 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "deploy": {
+    "preDeployCommand": ["flask --app watchpoint db upgrade"],
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 100
+  }
+}
