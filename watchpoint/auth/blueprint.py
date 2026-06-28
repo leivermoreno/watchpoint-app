@@ -49,6 +49,7 @@ def login():
         )
         if user and user.check_password(form.password.data):
             session.clear()
+            session.permanent = True
             session["user_id"] = user.id
 
             return redirect(next_url or url_for("index"))

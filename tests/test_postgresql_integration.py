@@ -215,6 +215,7 @@ def test_auth_signup_and_login_use_real_app_and_database(integration_app):
     assert login_response.status_code == 302
     assert urlsplit(login_response.headers["Location"]).path == "/"
     with client.session_transaction() as session:
+        assert session.permanent is True
         assert session["user_id"] == user_id
 
 
