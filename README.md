@@ -115,6 +115,41 @@ For production, serve the factory with a WSGI server, e.g.:
 gunicorn 'watchpoint:create_app()'
 ```
 
+## Run with Docker Compose
+
+The Compose workflow runs the app with Gunicorn and a local PostgreSQL service.
+Copy `.env.example` to `.env` and fill in `WATCHPOINT_SECRET_KEY` and
+`WATCHPOINT_WATCHMODE_API_KEY`. Compose overrides `WATCHPOINT_DATABASE_URI` so
+the app connects to the `db` container.
+
+Build the image:
+
+```sh
+docker compose build
+```
+
+Apply database migrations:
+
+```sh
+docker compose --profile tools run --rm migrate
+```
+
+Start the app:
+
+```sh
+docker compose up app
+```
+
+Then open <http://localhost:8000/>.
+
+The local Compose database stores data in a named Docker volume and uses
+`sslmode=disable` because the app and database communicate inside the local
+Compose network. For production deployments, use the built image with an
+external PostgreSQL database, provide the three required `WATCHPOINT_*`
+environment variables, keep PostgreSQL TLS enabled with `sslmode=require` or
+stronger, and run `flask --app watchpoint db upgrade` as a separate release or
+one-off migration step before serving traffic.
+
 ## Development checks
 
 Tests are run with pytest:

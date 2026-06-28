@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: watchpoint
+      POSTGRES_PASSWORD: watchpoint
+      POSTGRES_DB: watchpoint
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U watchpoint -d watchpoint"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    env_file:
+      - .env
+    environment:
+      WATCHPOINT_DATABASE_URI: postgresql+psycopg2://watchpoint:watchpoint@db:5432/watchpoint?sslmode=disable
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  migrate:
+    build: .
+    profiles:
+      - tools
+    env_file:
+      - .env
+    environment:
+      WATCHPOINT_DATABASE_URI: postgresql+psycopg2://watchpoint:watchpoint@db:5432/watchpoint?sslmode=disable
+    command: ["flask", "--app", "watchpoint", "db", "upgrade"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
