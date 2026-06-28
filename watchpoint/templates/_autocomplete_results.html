@@ -13,11 +13,21 @@
   {% elif titles %}
   <div class="list-group">
     {% for title in titles %}
+    {% set poster_url = title.image_url|default(title.poster_large|default('', true), true) %}
     <a
       href="{{ url_for(endpoint, title_id=title.id) }}"
-      class="list-group-item list-group-item-action px-3 py-2 mb-1 border-0"
-      >{{ title.name }}</a
+      class="title-search-result list-group-item list-group-item-action d-flex align-items-center gap-3 px-3 py-2 mb-1 border-0"
     >
+      {% if poster_url %}
+      <img
+        src="{{ poster_url }}"
+        class="title-search-result-poster flex-shrink-0"
+        alt=""
+        loading="lazy"
+      />
+      {% endif %}
+      <span class="title-search-result-name">{{ title.name }}</span>
+    </a>
     {% endfor %}
   </div>
   {% else %}

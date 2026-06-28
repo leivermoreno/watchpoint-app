@@ -108,7 +108,14 @@ def autocomplete_result_titles(titles):
         if not name:
             continue
 
-        results.append({"id": title_id, "name": name})
+        result = {"id": title_id, "name": name}
+        image_url = title.get("image_url")
+        if isinstance(image_url, str):
+            image_url = clean_search_query(image_url)
+            if image_url:
+                result["image_url"] = image_url
+
+        results.append(result)
 
     return results
 

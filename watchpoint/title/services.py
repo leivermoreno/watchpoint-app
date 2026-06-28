@@ -13,6 +13,7 @@ SEARCH_MIN_LENGTH = 3
 SEARCH_MAX_LENGTH = 100
 SEARCH_CACHE_TTL = timedelta(hours=24)
 TITLE_CACHE_TTL = timedelta(days=7)
+AUTOCOMPLETE_SEARCH_CACHE_PREFIX = "poster-v1:"
 
 
 def api_key():
@@ -51,7 +52,7 @@ def normalize_search_query(value):
 
 
 def autocomplete_search_cache_key(value):
-    return normalize_search_query(value)
+    return f"{AUTOCOMPLETE_SEARCH_CACHE_PREFIX}{normalize_search_query(value)}"
 
 
 def _is_fresh(fetched_at, ttl):
@@ -103,10 +104,14 @@ def filter_autocomplete_title_results(results):
             continue
 
         image_url = result.get("image_url")
-        if not isinstance(image_url, str) or not clean_search_query(image_url):
+        if not isinstance(image_url, str):
             continue
 
-        filtered.append({"id": title_id, "name": name})
+        image_url = clean_search_query(image_url)
+        if not image_url:
+            continue
+
+        filtered.append({"id": title_id, "name": name, "image_url": image_url})
         title_ids.add(title_id)
 
     return filtered

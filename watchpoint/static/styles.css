@@ -216,6 +216,25 @@ a:hover {
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
+.title-search-result {
+    min-height: 3.75rem;
+}
+
+.title-search-result-poster {
+    aspect-ratio: 2 / 3;
+    background: var(--wp-surface-muted);
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 3px rgba(18, 38, 49, 0.16);
+    height: 3rem;
+    object-fit: cover;
+    width: 2rem;
+}
+
+.title-search-result-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
 .title-search-results .list-group-item:hover,
 .title-search-results .list-group-item:focus {
     background: var(--wp-accent-soft);

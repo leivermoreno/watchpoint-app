@@ -35,9 +35,13 @@ def test_normalize_search_query_cleans_and_casefolds():
     assert normalize_search_query("  The   MATRIX  ") == "the matrix"
 
 
-def test_autocomplete_result_titles_keeps_only_valid_id_and_name_pairs():
+def test_autocomplete_result_titles_keeps_valid_rows_and_optional_poster_url():
     titles = [
-        {"id": "42", "name": "Heat"},
+        {
+            "id": "42",
+            "name": "Heat",
+            "image_url": " https://example.test/heat.jpg ",
+        },
         {"id": "not-an-int", "name": "Bad ID"},
         {"name": "Missing ID"},
         {"id": 7, "name": ""},
@@ -47,6 +51,6 @@ def test_autocomplete_result_titles_keeps_only_valid_id_and_name_pairs():
     ]
 
     assert autocomplete_result_titles(titles) == [
-        {"id": 42, "name": "Heat"},
+        {"id": 42, "name": "Heat", "image_url": "https://example.test/heat.jpg"},
         {"id": 99, "name": "Alien"},
     ]

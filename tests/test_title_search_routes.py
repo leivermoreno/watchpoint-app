@@ -96,9 +96,17 @@ def test_search_results_context_returns_valid_autocomplete_titles(monkeypatch):
     def fake_get_autocomplete_titles(query):
         calls.append(query)
         return [
-            {"id": "42", "name": "Heat"},
+            {
+                "id": "42",
+                "name": "Heat",
+                "image_url": "https://example.test/heat.jpg",
+            },
             {"id": "not-an-int", "name": "Bad ID"},
-            {"id": 99, "name": "Alien"},
+            {
+                "id": 99,
+                "name": "Alien",
+                "image_url": "https://example.test/alien.jpg",
+            },
         ]
 
     monkeypatch.setattr(
@@ -112,8 +120,16 @@ def test_search_results_context_returns_valid_autocomplete_titles(monkeypatch):
     assert calls == ["heat"]
     assert context == {
         "titles": [
-            {"id": 42, "name": "Heat"},
-            {"id": 99, "name": "Alien"},
+            {
+                "id": 42,
+                "name": "Heat",
+                "image_url": "https://example.test/heat.jpg",
+            },
+            {
+                "id": 99,
+                "name": "Alien",
+                "image_url": "https://example.test/alien.jpg",
+            },
         ],
         "message": None,
         "show_results": True,
@@ -145,7 +161,13 @@ def test_index_htmx_request_renders_autocomplete_fragment(title_app, monkeypatch
 
     def fake_get_autocomplete_titles(query):
         autocomplete_calls.append(query)
-        return [{"id": "42", "name": "Heat"}]
+        return [
+            {
+                "id": "42",
+                "name": "Heat",
+                "image_url": "https://example.test/heat.jpg",
+            }
+        ]
 
     def fake_render_autocomplete_results(**context):
         rendered_contexts.append(context)
@@ -173,7 +195,13 @@ def test_index_htmx_request_renders_autocomplete_fragment(title_app, monkeypatch
     assert autocomplete_calls == ["Heat"]
     assert rendered_contexts == [
         {
-            "titles": [{"id": 42, "name": "Heat"}],
+            "titles": [
+                {
+                    "id": 42,
+                    "name": "Heat",
+                    "image_url": "https://example.test/heat.jpg",
+                }
+            ],
             "message": None,
             "show_results": True,
         }
@@ -219,7 +247,13 @@ def test_index_full_page_renders_template_contract(title_app, monkeypatch):
 
     def fake_get_autocomplete_titles(query):
         autocomplete_calls.append(query)
-        return [{"id": "42", "name": "Heat"}]
+        return [
+            {
+                "id": "42",
+                "name": "Heat",
+                "image_url": "https://example.test/heat.jpg",
+            }
+        ]
 
     monkeypatch.setattr(
         title_blueprint,
@@ -235,6 +269,8 @@ def test_index_full_page_renders_template_contract(title_app, monkeypatch):
     assert f'minlength="{SEARCH_MIN_LENGTH}"' in response.text
     assert f'maxlength="{SEARCH_MAX_LENGTH}"' in response.text
     assert 'href="/42"' in response.text
+    assert 'src="https://example.test/heat.jpg"' in response.text
+    assert 'class="title-search-result-poster flex-shrink-0"' in response.text
     assert 'href="/"' in response.text
     assert 'href="/review/"' in response.text
     assert 'href="/auth/login"' in response.text

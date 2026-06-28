@@ -94,7 +94,8 @@ def test_is_fresh_rejects_missing_timestamp():
 
 def test_autocomplete_search_cache_key_normalizes_query():
     assert (
-        title_services.autocomplete_search_cache_key("  The   MATRIX  ") == "the matrix"
+        title_services.autocomplete_search_cache_key("  The   MATRIX  ")
+        == "poster-v1:the matrix"
     )
 
 
@@ -108,7 +109,13 @@ def test_filter_autocomplete_title_results_accepts_title_with_poster():
                 "image_url": " https://example.test/poster.jpg ",
             }
         ]
-    ) == [{"id": 42, "name": "Heat"}]
+    ) == [
+        {
+            "id": 42,
+            "name": "Heat",
+            "image_url": "https://example.test/poster.jpg",
+        }
+    ]
 
 
 @pytest.mark.parametrize(
@@ -156,7 +163,7 @@ def test_filter_autocomplete_title_results_rejects_invalid_rows_and_dedupes_ids(
     ]
 
     assert title_services.filter_autocomplete_title_results(rows) == [
-        {"id": 42, "name": "Heat"}
+        {"id": 42, "name": "Heat", "image_url": "poster"}
     ]
 
 
@@ -334,8 +341,11 @@ def test_get_autocomplete_titles_fetches_title_results_and_caches_normalized_row
 
     results = title_services.get_autocomplete_titles("  Heat  ")
 
-    assert results == [{"id": 42, "name": "Heat"}, {"id": 7, "name": "Alien"}]
-    assert session.get_calls == [(TitleSearchCache, "heat")]
+    assert results == [
+        {"id": 42, "name": "Heat", "image_url": "https://example.test/heat.jpg"},
+        {"id": 7, "name": "Alien", "image_url": "https://example.test/alien.jpg"},
+    ]
+    assert session.get_calls == [(TitleSearchCache, "poster-v1:heat")]
     assert autocomplete_calls == [
         (
             "https://api.watchmode.com/v1/autocomplete-search/",
@@ -344,15 +354,21 @@ def test_get_autocomplete_titles_fetches_title_results_and_caches_normalized_row
         )
     ]
     assert all("/title/" not in url for url, _, _ in autocomplete_calls)
-    assert upsert_calls == [("heat", results)]
+    assert upsert_calls == [("poster-v1:heat", results)]
 
 
 def test_get_autocomplete_titles_returns_fresh_cached_search_without_refresh(
     monkeypatch,
 ):
     cached = SimpleNamespace(
-        query="heat",
-        results=[{"id": 42, "name": "Heat"}],
+        query="poster-v1:heat",
+        results=[
+            {
+                "id": 42,
+                "name": "Heat",
+                "image_url": "https://example.test/heat.jpg",
+            }
+        ],
         fetched_at=datetime.now(timezone.utc),
     )
     session = FakeSession(cached)
@@ -365,17 +381,23 @@ def test_get_autocomplete_titles_returns_fresh_cached_search_without_refresh(
     monkeypatch.setattr(title_services, "upsert_search_cache", fail_if_called)
 
     assert title_services.get_autocomplete_titles("  HEAT  ") == [
-        {"id": 42, "name": "Heat"}
+        {"id": 42, "name": "Heat", "image_url": "https://example.test/heat.jpg"}
     ]
-    assert session.get_calls == [(TitleSearchCache, "heat")]
+    assert session.get_calls == [(TitleSearchCache, "poster-v1:heat")]
 
 
 def test_get_autocomplete_titles_returns_stale_cache_when_watchmode_fails(
     monkeypatch,
 ):
     cached = SimpleNamespace(
-        query="heat",
-        results=[{"id": 42, "name": "Heat"}],
+        query="poster-v1:heat",
+        results=[
+            {
+                "id": 42,
+                "name": "Heat",
+                "image_url": "https://example.test/heat.jpg",
+            }
+        ],
         fetched_at=datetime.now(timezone.utc) - title_services.SEARCH_CACHE_TTL,
     )
     session = FakeSession(cached)
@@ -394,9 +416,9 @@ def test_get_autocomplete_titles_returns_stale_cache_when_watchmode_fails(
     monkeypatch.setattr(title_services, "upsert_search_cache", fail_if_called)
 
     assert title_services.get_autocomplete_titles("  HEAT  ") == [
-        {"id": 42, "name": "Heat"}
+        {"id": 42, "name": "Heat", "image_url": "https://example.test/heat.jpg"}
     ]
-    assert session.get_calls == [(TitleSearchCache, "heat")]
+    assert session.get_calls == [(TitleSearchCache, "poster-v1:heat")]
     assert autocomplete_calls == [
         (
             "https://api.watchmode.com/v1/autocomplete-search/",
