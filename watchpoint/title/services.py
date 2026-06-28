@@ -50,6 +50,10 @@ def normalize_search_query(value):
     return clean_search_query(value).casefold()
 
 
+def autocomplete_search_cache_key(value):
+    return normalize_search_query(value)
+
+
 def _is_fresh(fetched_at, ttl):
     if fetched_at is None:
         return False
@@ -58,6 +62,54 @@ def _is_fresh(fetched_at, ttl):
         fetched_at = fetched_at.replace(tzinfo=timezone.utc)
 
     return fetched_at >= datetime.now(timezone.utc) - ttl
+
+
+def _autocomplete_title_id(value):
+    if isinstance(value, bool):
+        return None
+
+    if isinstance(value, int):
+        return value
+
+    if isinstance(value, str):
+        value = value.strip()
+        if value.isdigit():
+            return int(value)
+
+    return None
+
+
+def filter_autocomplete_title_results(results):
+    filtered = []
+    title_ids = set()
+
+    for result in results:
+        if not isinstance(result, dict):
+            continue
+
+        if result.get("result_type") != "title":
+            continue
+
+        title_id = _autocomplete_title_id(result.get("id"))
+        if title_id is None or title_id in title_ids:
+            continue
+
+        name = result.get("name")
+        if not isinstance(name, str):
+            continue
+
+        name = clean_search_query(name)
+        if not name:
+            continue
+
+        image_url = result.get("image_url")
+        if not isinstance(image_url, str) or not clean_search_query(image_url):
+            continue
+
+        filtered.append({"id": title_id, "name": name})
+        title_ids.add(title_id)
+
+    return filtered
 
 
 def get_autocomplete_titles(s):
@@ -69,14 +121,14 @@ def get_autocomplete_titles(s):
     if error == "too_long":
         abort(400, description="Search query is too long.")
 
-    cache_key = normalize_search_query(query)
+    cache_key = autocomplete_search_cache_key(query)
     cached = db.session.get(TitleSearchCache, cache_key)
     if cached and _is_fresh(cached.fetched_at, SEARCH_CACHE_TTL):
         return cached.results
 
     result = _get_watchmode_json(
         "https://api.watchmode.com/v1/autocomplete-search/",
-        {"apiKey": api_key(), "search_value": query},
+        {"apiKey": api_key(), "search_value": query, "search_type": 2},
         abort_on_error=cached is None,
     )
 
@@ -85,8 +137,9 @@ def get_autocomplete_titles(s):
         if not isinstance(results, list):
             results = []
 
-        upsert_search_cache(cache_key, results)
-        return results
+        filtered_results = filter_autocomplete_title_results(results)
+        upsert_search_cache(cache_key, filtered_results)
+        return filtered_results
 
     if cached:
         return cached.results

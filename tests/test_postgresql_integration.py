@@ -245,18 +245,19 @@ def test_title_and_search_cache_upserts_update_existing_rows(integration_app):
         ]
         assert refreshed_title.fetched_at > old_title_fetched_at
 
-        title_services.upsert_search_cache("heat", [{"id": 42, "name": "Heat"}])
-        cache = db.session.get_one(TitleSearchCache, "heat")
+        cache_key = title_services.autocomplete_search_cache_key("heat")
+        title_services.upsert_search_cache(cache_key, [{"id": 42, "name": "Heat"}])
+        cache = db.session.get_one(TitleSearchCache, cache_key)
         old_cache_fetched_at = datetime.now(timezone.utc) - timedelta(days=2)
         cache.fetched_at = old_cache_fetched_at
         db.session.commit()
 
         title_services.upsert_search_cache(
-            "heat", [{"id": 42, "name": "Heat: Director's Cut"}]
+            cache_key, [{"id": 42, "name": "Heat: Director's Cut"}]
         )
 
         cache_rows = db.session.scalars(select(TitleSearchCache)).all()
-        refreshed_cache = db.session.get_one(TitleSearchCache, "heat")
+        refreshed_cache = db.session.get_one(TitleSearchCache, cache_key)
         assert len(cache_rows) == 1
         assert refreshed_cache.results == [{"id": 42, "name": "Heat: Director's Cut"}]
         assert refreshed_cache.fetched_at > old_cache_fetched_at
@@ -282,13 +283,15 @@ def test_stale_title_and_search_cache_fall_back_to_cached_rows(
         assert title_services.get_title_info_or_404("42").name == "Heat"
         assert db.session.scalar(select(func.count()).select_from(Title)) == 1
 
-        title_services.upsert_search_cache("heat", [{"id": 42, "name": "Heat"}])
-        cache = db.session.get_one(TitleSearchCache, "heat")
+        cache_key = title_services.autocomplete_search_cache_key("heat")
+        title_services.upsert_search_cache(cache_key, [{"id": 42, "name": "Heat"}])
+        cache = db.session.get_one(TitleSearchCache, cache_key)
         cache.fetched_at = datetime.now(timezone.utc) - timedelta(days=2)
         db.session.commit()
 
         def fail_autocomplete(url, params, abort_on_error=True):
             assert abort_on_error is False
+            assert params["search_type"] == 2
             return None
 
         monkeypatch.setattr(title_services, "_get_watchmode_json", fail_autocomplete)

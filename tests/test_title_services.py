@@ -92,6 +92,74 @@ def test_is_fresh_rejects_missing_timestamp():
     assert not title_services._is_fresh(None, timedelta(minutes=10))
 
 
+def test_autocomplete_search_cache_key_normalizes_query():
+    assert (
+        title_services.autocomplete_search_cache_key("  The   MATRIX  ") == "the matrix"
+    )
+
+
+def test_filter_autocomplete_title_results_accepts_title_with_poster():
+    assert title_services.filter_autocomplete_title_results(
+        [
+            {
+                "id": "42",
+                "name": "  Heat  ",
+                "result_type": "title",
+                "image_url": " https://example.test/poster.jpg ",
+            }
+        ]
+    ) == [{"id": 42, "name": "Heat"}]
+
+
+@pytest.mark.parametrize(
+    "row",
+    [
+        {"id": 42, "name": "Heat", "result_type": "title"},
+        {"id": 42, "name": "Heat", "result_type": "title", "image_url": ""},
+        {"id": 42, "name": "Heat", "result_type": "title", "image_url": "   "},
+    ],
+)
+def test_filter_autocomplete_title_results_rejects_missing_or_blank_image_url(row):
+    assert title_services.filter_autocomplete_title_results([row]) == []
+
+
+def test_filter_autocomplete_title_results_rejects_invalid_rows_and_dedupes_ids():
+    rows = [
+        {"id": 1, "name": "Person", "result_type": "person", "image_url": "poster"},
+        {"id": True, "name": "Bool", "result_type": "title", "image_url": "poster"},
+        {"id": 4.2, "name": "Float", "result_type": "title", "image_url": "poster"},
+        {"id": "", "name": "Blank ID", "result_type": "title", "image_url": "poster"},
+        {
+            "id": "   ",
+            "name": "Whitespace ID",
+            "result_type": "title",
+            "image_url": "poster",
+        },
+        {
+            "id": "not-an-int",
+            "name": "Bad ID",
+            "result_type": "title",
+            "image_url": "poster",
+        },
+        {"id": 7, "name": "", "result_type": "title", "image_url": "poster"},
+        {"id": 8, "name": "   ", "result_type": "title", "image_url": "poster"},
+        {"id": 9, "result_type": "title", "image_url": "poster"},
+        None,
+        "bad-row",
+        {"id": "42", "name": "Heat", "result_type": "title", "image_url": "poster"},
+        {
+            "id": 42,
+            "name": "Heat Duplicate",
+            "result_type": "title",
+            "image_url": "poster",
+        },
+    ]
+
+    assert title_services.filter_autocomplete_title_results(rows) == [
+        {"id": 42, "name": "Heat"}
+    ]
+
+
 def test_get_sources_keeps_us_sources_once_per_provider(monkeypatch):
     sources = [
         {"name": "Netflix", "region": "CA", "web_url": "ignored"},
@@ -218,6 +286,67 @@ def test_get_title_info_or_404_returns_stale_cache_when_refresh_fails(monkeypatc
     assert refresh_calls == [(42, False, cached_sources)]
 
 
+def test_get_autocomplete_titles_fetches_title_results_and_caches_normalized_rows(
+    monkeypatch,
+):
+    session = FakeSession(None)
+    autocomplete_calls = []
+    upsert_calls = []
+
+    def fake_get_watchmode_json(url, params, abort_on_error=True):
+        autocomplete_calls.append((url, params, abort_on_error))
+        return {
+            "results": [
+                {
+                    "id": "42",
+                    "name": "  Heat  ",
+                    "result_type": "title",
+                    "image_url": "https://example.test/heat.jpg",
+                },
+                {
+                    "id": 42,
+                    "name": "Heat Duplicate",
+                    "result_type": "title",
+                    "image_url": "https://example.test/heat-2.jpg",
+                },
+                {
+                    "id": "7",
+                    "name": "Alien",
+                    "result_type": "title",
+                    "image_url": "https://example.test/alien.jpg",
+                },
+                {
+                    "id": "8",
+                    "name": "A Person",
+                    "result_type": "person",
+                    "image_url": "https://example.test/person.jpg",
+                },
+            ]
+        }
+
+    def fake_upsert_search_cache(query, results):
+        upsert_calls.append((query, results))
+
+    monkeypatch.setattr(title_services, "api_key", lambda: "test-api-key")
+    monkeypatch.setattr(title_services, "db", SimpleNamespace(session=session))
+    monkeypatch.setattr(title_services, "_get_watchmode_json", fake_get_watchmode_json)
+    monkeypatch.setattr(title_services, "upsert_search_cache", fake_upsert_search_cache)
+
+    results = title_services.get_autocomplete_titles("  Heat  ")
+
+    assert results == [{"id": 42, "name": "Heat"}, {"id": 7, "name": "Alien"}]
+    assert session.get_calls == [(TitleSearchCache, "heat")]
+    assert autocomplete_calls == [
+        (
+            "https://api.watchmode.com/v1/autocomplete-search/",
+            {"apiKey": "test-api-key", "search_value": "Heat", "search_type": 2},
+            True,
+        )
+    ]
+    assert all("/title/" not in url for url, _, _ in autocomplete_calls)
+    assert upsert_calls == [("heat", results)]
+
+
 def test_get_autocomplete_titles_returns_fresh_cached_search_without_refresh(
     monkeypatch,
 ):
@@ -271,7 +400,7 @@ def test_get_autocomplete_titles_returns_stale_cache_when_watchmode_fails(
     assert autocomplete_calls == [
         (
             "https://api.watchmode.com/v1/autocomplete-search/",
-            {"apiKey": "test-api-key", "search_value": "HEAT"},
+            {"apiKey": "test-api-key", "search_value": "HEAT", "search_type": 2},
             False,
         )
     ]
