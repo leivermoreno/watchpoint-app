@@ -108,9 +108,7 @@ def test_protected_routes_redirect_unauthenticated(
         review_blueprint,
         "db",
         SimpleNamespace(
-            get_or_404=lambda *args, **kwargs: pytest.fail(
-                "unexpected review lookup"
-            )
+            get_or_404=lambda *args, **kwargs: pytest.fail("unexpected review lookup")
         ),
     )
 
@@ -247,9 +245,7 @@ def test_modify_watchlist_flashes_warning_for_invalid_status(route_app, monkeypa
     response = client.post("/watchlist/42", data={"watchlist": "bogus"})
 
     assert response.status_code == 302
-    assert flashed_messages(client) == [
-        ("warning", "Choose a valid watchlist status.")
-    ]
+    assert flashed_messages(client) == [("warning", "Choose a valid watchlist status.")]
 
 
 def test_create_review_valid_form_calls_upsert(route_app, monkeypatch):
@@ -415,8 +411,7 @@ def test_show_reviews_normalizes_invalid_page_and_sort(route_app, monkeypatch):
     assert rendered_contexts[0][1]["review_filter_args"] == {}
     assert rendered_contexts[0][1]["sort_by"] == "newest"
     assert (
-        rendered_contexts[0][1]["sort_options"]
-        == review_blueprint.REVIEW_SORT_OPTIONS
+        rendered_contexts[0][1]["sort_options"] == review_blueprint.REVIEW_SORT_OPTIONS
     )
     assert rendered_contexts[0][1]["search_min_length"] == SEARCH_MIN_LENGTH
     assert rendered_contexts[0][1]["search_max_length"] == SEARCH_MAX_LENGTH

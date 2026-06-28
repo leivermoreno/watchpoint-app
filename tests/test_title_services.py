@@ -112,9 +112,7 @@ def test_get_sources_keeps_us_sources_once_per_provider(monkeypatch):
         return sources
 
     monkeypatch.setattr(title_services, "api_key", lambda: "test-api-key")
-    monkeypatch.setattr(
-        title_services, "_get_watchmode_json", fake_get_watchmode_json
-    )
+    monkeypatch.setattr(title_services, "_get_watchmode_json", fake_get_watchmode_json)
 
     assert title_services.get_sources(42, abort_on_error=False) == [
         {"name": "Netflix", "region": "US", "web_url": "netflix-us"},
@@ -263,9 +261,7 @@ def test_get_autocomplete_titles_returns_stale_cache_when_watchmode_fails(
 
     monkeypatch.setattr(title_services, "api_key", lambda: "test-api-key")
     monkeypatch.setattr(title_services, "db", SimpleNamespace(session=session))
-    monkeypatch.setattr(
-        title_services, "_get_watchmode_json", fake_get_watchmode_json
-    )
+    monkeypatch.setattr(title_services, "_get_watchmode_json", fake_get_watchmode_json)
     monkeypatch.setattr(title_services, "upsert_search_cache", fail_if_called)
 
     assert title_services.get_autocomplete_titles("  HEAT  ") == [

@@ -79,9 +79,7 @@ def title_payload(title_id, title, **overrides):
 
 
 def uri_with_non_utc_session_timezone(uri):
-    url = make_url(uri).update_query_dict(
-        {"options": "-c timezone=America/New_York"}
-    )
+    url = make_url(uri).update_query_dict({"options": "-c timezone=America/New_York"})
     return url.render_as_string(hide_password=False)
 
 
@@ -353,9 +351,7 @@ def test_vote_toggle_inserts_deletes_and_updates_one_vote_row(integration_app):
         title_services.upsert_title(title_payload(42, "Heat"))
         author_id = create_user("author")
         voter_id = create_user("voter")
-        review_id = create_review_row(
-            42, author_id, "This review has enough detail."
-        )
+        review_id = create_review_row(42, author_id, "This review has enough detail.")
 
         with integration_app.test_request_context("/"):
             g.user = SimpleNamespace(id=voter_id)
