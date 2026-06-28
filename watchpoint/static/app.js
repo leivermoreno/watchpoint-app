@@ -36,6 +36,21 @@ function toggleAutocompletePanel(input, show) {
   }
 }
 
+function autocompleteInputHasText(input) {
+  return input.value.trim().length > 0;
+}
+
+function shouldKeepAutocompletePanelOpen(input) {
+  return (
+    input.dataset.keepResultsWhenPopulated === "true" &&
+    autocompleteInputHasText(input)
+  );
+}
+
+function shouldDismissAutocompletePanel(input) {
+  return !shouldKeepAutocompletePanelOpen(input);
+}
+
 function autocompleteInputs() {
   return document.querySelectorAll("input[aria-controls]");
 }
@@ -56,7 +71,12 @@ function bindAutocompleteDismissal() {
     window.setTimeout(() => {
       const panel = autocompletePanelFor(input);
       const activeElement = document.activeElement;
-      if (panel && activeElement !== input && !panel.contains(activeElement)) {
+      if (
+        panel &&
+        activeElement !== input &&
+        !panel.contains(activeElement) &&
+        shouldDismissAutocompletePanel(input)
+      ) {
         toggleAutocompletePanel(input, false);
       }
     }, 100);
@@ -65,7 +85,12 @@ function bindAutocompleteDismissal() {
   document.addEventListener("pointerdown", (event) => {
     autocompleteInputs().forEach((input) => {
       const panel = autocompletePanelFor(input);
-      if (panel && event.target !== input && !panel.contains(event.target)) {
+      if (
+        panel &&
+        event.target !== input &&
+        !panel.contains(event.target) &&
+        shouldDismissAutocompletePanel(input)
+      ) {
         toggleAutocompletePanel(input, false);
       }
     });
@@ -74,11 +99,14 @@ function bindAutocompleteDismissal() {
   document.body.addEventListener("htmx:afterSwap", (event) => {
     autocompleteInputs().forEach((input) => {
       const panel = autocompletePanelFor(input);
-      if (!panel || event.target !== panel) {
+      if (!panel || event.detail.target !== panel) {
         return;
       }
 
-      toggleAutocompletePanel(input, document.activeElement === input);
+      toggleAutocompletePanel(
+        input,
+        document.activeElement === input || shouldKeepAutocompletePanelOpen(input),
+      );
     });
   });
 }

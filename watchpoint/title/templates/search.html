@@ -22,6 +22,7 @@
               maxlength="{{ search_max_length }}"
               autocomplete="off"
               aria-controls="titleSearchResults"
+              data-keep-results-when-populated="true"
               hx-get="{{ url_for('title.index') }}"
               hx-trigger="input changed delay:250ms, search"
               hx-target="#titleSearchResults"

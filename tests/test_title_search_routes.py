@@ -266,6 +266,7 @@ def test_index_full_page_renders_template_contract(title_app, monkeypatch):
     assert response.status_code == 200
     assert autocomplete_calls == ["Heat"]
     assert 'value="Heat"' in response.text
+    assert 'data-keep-results-when-populated="true"' in response.text
     assert f'minlength="{SEARCH_MIN_LENGTH}"' in response.text
     assert f'maxlength="{SEARCH_MAX_LENGTH}"' in response.text
     assert 'href="/42"' in response.text
