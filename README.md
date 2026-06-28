@@ -26,6 +26,27 @@ PostgreSQL-specific `INSERT ... ON CONFLICT` upserts, and title/search cache
 storage uses PostgreSQL `JSONB`. Supporting another database would require code
 and schema changes.
 
+## Technical decisions
+
+The full set of technical decisions is documented in
+[technical-decisions.md](technical-decisions.md).
+
+### Title and search caching
+
+Watchpoint treats Watchmode as the source of title data, but it does not call the
+API for every page view or autocomplete request. Title details are cached for 7
+days, and autocomplete search results are cached for 24 hours. This keeps the app
+responsive, reduces external API usage, and lets the app fall back to stale
+cached data when Watchmode is temporarily unavailable.
+
+### Timezone policy
+
+Backend timestamps represent UTC instants. PostgreSQL stores them as
+`timestamptz` values, the database session is pinned to UTC, and templates emit
+ISO datetimes. Browser-side JavaScript then renders those timestamps in each
+viewer's local timezone, so the stored data stays consistent while the UI remains
+local to the person viewing it.
+
 ## How to run
 
 1. Create a virtual environment and install dependencies:
