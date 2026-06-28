@@ -134,3 +134,22 @@ ruff check --select I --fix .
 ruff format .
 ruff format --check .
 ```
+
+Local Git hooks are managed with pre-commit. After installing the development
+requirements, install both the pre-commit and pre-push hooks:
+
+```sh
+pre-commit install
+```
+
+Pre-commit runs Ruff with fixes before each commit. Pre-push runs the full
+non-mutating check suite:
+
+```sh
+pre-commit run --all-files
+pre-commit run --hook-stage pre-push --all-files
+```
+
+The pre-push pytest hook requires the same PostgreSQL test database environment
+as `python -m pytest`: `WATCHPOINT_TEST_DATABASE_URI` and
+`WATCHPOINT_ALLOW_DESTRUCTIVE_TESTS=1`.
