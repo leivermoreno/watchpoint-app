@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Title Search{% endblock %}
 {% block content %}
-<div class="container search-page d-flex">
+<div class="container search-page d-flex{% if query %} search-page-has-query{% endif %}">
   <div class="search-content content-narrow w-100 mx-auto">
     <div class="page-header text-center">
       <h1 class="page-title">Title Search</h1>

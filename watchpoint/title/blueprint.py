@@ -38,19 +38,25 @@ def index():
 
     if htmx_request:
         response = make_response(render_autocomplete_results(**results))
-        if not query:
-            response.headers["HX-Replace-Url"] = url_for("title.index")
+        response.headers["HX-Replace-Url"] = url_for(
+            "title.index", **({"q": query} if query else {})
+        )
+        response.vary.add("HX-Request")
 
         return response
 
-    return render_template(
-        "search.html",
-        search_min_length=SEARCH_MIN_LENGTH,
-        search_max_length=SEARCH_MAX_LENGTH,
-        query=query,
-        results_overlay=False,
-        **results,
+    response = make_response(
+        render_template(
+            "search.html",
+            search_min_length=SEARCH_MIN_LENGTH,
+            search_max_length=SEARCH_MAX_LENGTH,
+            query=query,
+            results_overlay=False,
+            **results,
+        )
     )
+    response.vary.add("HX-Request")
+    return response
 
 
 def is_htmx_request():

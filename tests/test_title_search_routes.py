@@ -191,7 +191,8 @@ def test_index_htmx_request_renders_autocomplete_fragment(title_app, monkeypatch
 
     assert response.status_code == 200
     assert response.text == "autocomplete-fragment"
-    assert "HX-Replace-Url" not in response.headers
+    assert response.headers["HX-Replace-Url"] == "/?q=Heat"
+    assert "HX-Request" in response.headers["Vary"]
     assert autocomplete_calls == ["Heat"]
     assert rendered_contexts == [
         {
@@ -233,6 +234,7 @@ def test_index_htmx_empty_query_replaces_url(title_app, monkeypatch):
     assert response.status_code == 200
     assert response.text == "empty-fragment"
     assert response.headers["HX-Replace-Url"] == "/"
+    assert "HX-Request" in response.headers["Vary"]
     assert rendered_contexts == [
         {
             "titles": [],
@@ -264,7 +266,9 @@ def test_index_full_page_renders_template_contract(title_app, monkeypatch):
     response = title_app.test_client().get("/?q=  Heat  ")
 
     assert response.status_code == 200
+    assert "HX-Request" in response.headers["Vary"]
     assert autocomplete_calls == ["Heat"]
+    assert 'class="container search-page d-flex search-page-has-query"' in response.text
     assert 'value="Heat"' in response.text
     assert 'data-keep-results-when-populated="true"' in response.text
     assert f'minlength="{SEARCH_MIN_LENGTH}"' in response.text

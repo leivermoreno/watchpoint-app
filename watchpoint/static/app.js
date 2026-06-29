@@ -15,6 +15,10 @@ function renderLocalDates() {
   });
 }
 
+if (window.htmx) {
+  window.htmx.config.historyRestoreAsHxRequest = false;
+}
+
 function autocompletePanelFor(input) {
   const panelId = input.getAttribute("aria-controls");
   if (!panelId) {
@@ -38,6 +42,51 @@ function toggleAutocompletePanel(input, show) {
 
 function autocompleteInputHasText(input) {
   return input.value.trim().length > 0;
+}
+
+function titleSearchInput() {
+  const input = document.getElementById("titleNameInput");
+  return input instanceof HTMLInputElement ? input : null;
+}
+
+function cleanSearchQuery(value) {
+  return value.split(/\s+/).filter(Boolean).join(" ");
+}
+
+function titleSearchQueryFromLocation() {
+  const params = new URLSearchParams(window.location.search);
+  return params.has("q") ? cleanSearchQuery(params.get("q") || "") : "";
+}
+
+function setTitleSearchPageState(input) {
+  const page = input.closest(".search-page");
+  if (page) {
+    page.classList.toggle("search-page-has-query", autocompleteInputHasText(input));
+  }
+}
+
+function restoreTitleSearchFromLocation() {
+  const input = titleSearchInput();
+  if (!input) {
+    return;
+  }
+
+  const query = titleSearchQueryFromLocation();
+  input.value = query;
+  input.defaultValue = query;
+  setTitleSearchPageState(input);
+  toggleAutocompletePanel(input, autocompleteInputHasText(input));
+}
+
+function bindTitleSearchState() {
+  const input = titleSearchInput();
+  if (!input) {
+    return;
+  }
+
+  setTitleSearchPageState(input);
+  input.addEventListener("input", () => setTitleSearchPageState(input));
+  input.addEventListener("search", () => setTitleSearchPageState(input));
 }
 
 function shouldKeepAutocompletePanelOpen(input) {
@@ -112,4 +161,6 @@ function bindAutocompleteDismissal() {
 }
 
 document.addEventListener("DOMContentLoaded", renderLocalDates);
+document.addEventListener("DOMContentLoaded", bindTitleSearchState);
 document.addEventListener("DOMContentLoaded", bindAutocompleteDismissal);
+window.addEventListener("pageshow", restoreTitleSearchFromLocation);

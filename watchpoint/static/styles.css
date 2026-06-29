@@ -181,7 +181,7 @@ a:hover {
     will-change: transform;
 }
 
-.search-page:has(#titleNameInput:not(:placeholder-shown)) .search-content {
+.search-page.search-page-has-query .search-content {
     transform: translateY(0);
 }
 
